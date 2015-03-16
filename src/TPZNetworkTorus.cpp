@@ -102,7 +102,7 @@ TPZNetworkTorus :: TPZNetworkTorus( const TPZComponentId& id,
                  : TPZNetwork(id,routerId,x,y,z)
 {
    unsigned diametro=getDiameter();
-   initializeHistogram(diametro);
+   initializeHistogram(diametro); // Anderson: histogram may be used to provide information about flit distance distribution.
 }
 
 
@@ -166,7 +166,7 @@ void TPZNetworkTorus :: initialize()
       {
          for( k=0; k<getSizeZ(); k++ )
          {
-            initializeConnectionsFor(TPZPosition(i,j,k));
+            initializeConnectionsFor(TPZPosition(i,j,k));  // Anderson: for Torus, use the implementation of virtual function in TPZNetwork::initializeConnectionsFor(const TPZPosition& pos); 
          }
       }
    setInitializated(true);
@@ -329,7 +329,7 @@ TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
    }
    if(tag->tagName()==TPZ_TAG_TORUSNET)
    {
-      net = new TPZNetworkTorus( idNetwork, routerId, x, y, z );
+      net = new TPZNetworkTorus( idNetwork, routerId, x, y, z ); // Anderson: Torus network is created here.
    }
    else if(tag->tagName()==TPZ_TAG_MESHNET)
    {

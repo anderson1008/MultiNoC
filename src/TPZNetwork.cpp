@@ -187,6 +187,7 @@ TPZNetwork::TPZNetwork(const TPZComponentId& id, const TPZString& routerId,
 {
     m_RouterMatrix = new TPZRouterMatrix(m_SizeX, m_SizeY, m_SizeZ);
     m_RouterMatrix->initialize(0);
+    // Anderson: below are a bunch of statistical initialization.
     m_InjectedFlitsMap = new TPZUnsignedMatrix(m_SizeX, m_SizeY, m_SizeZ);
     m_ReceivedFlitsMap = new TPZUnsignedMatrix(m_SizeX, m_SizeY, m_SizeZ);
     m_InjectedFlitsMap->initialize(0);
@@ -1647,6 +1648,9 @@ void TPZNetwork::incrementMessagesDistance(unsigned long dst)
 //:
 //*************************************************************************
 
+// By Anderson:
+// The basic torus/mesh is connected here.
+
 void TPZNetwork::initializeConnectionsFor(const TPZPosition& pos) {
 
     TPZRouter* router = getRouterAt(pos);
@@ -1671,69 +1675,69 @@ void TPZNetwork::initializeConnectionsFor(const TPZPosition& pos) {
     unsigned oZp = router->getInputWithType(_Zplus_);
     unsigned oZm = router->getInputWithType(_Zminus_);
 
-        if (m_channelOperationMode == TPZString("HALFDUPLEX"))
-        {
-           if( iXp && oXp )
-           {
+   if (m_channelOperationMode == TPZString("HALFDUPLEX"))
+   {
+     if( iXp && oXp )
+     {
 
-           TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oXp),
-                                           routerXp->getInputInterfaz(iXp),
-                                           getConnectionDelay() );
-               TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oXp+4),
-                                           routerXp->getInputInterfaz(iXp+4),
-                                           getConnectionDelay() );
-            }
+     TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oXp),
+                                     routerXp->getInputInterfaz(iXp),
+                                     getConnectionDelay() );
+         TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oXp+4),
+                                     routerXp->getInputInterfaz(iXp+4),
+                                     getConnectionDelay() );
+      }
 
-            if( iXm && oXm )
-            {
+      if( iXm && oXm )
+      {
 
-           TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oXm),
-                                           routerXm->getInputInterfaz(iXm),
-                                           getConnectionDelay() );
-               TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oXm+4),
-                                           routerXm->getInputInterfaz(iXm+4),
-                                           getConnectionDelay() );
-            }
-            if( iYp && oYp )
-            {
+     TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oXm),
+                                     routerXm->getInputInterfaz(iXm),
+                                     getConnectionDelay() );
+         TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oXm+4),
+                                     routerXm->getInputInterfaz(iXm+4),
+                                     getConnectionDelay() );
+      }
+      if( iYp && oYp )
+      {
 
-           TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oYp),
-                                           routerYp->getInputInterfaz(iYp),
-                                           getConnectionDelay() );
-               TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oYp+4),
-                                           routerYp->getInputInterfaz(iYp+4),
-                                           getConnectionDelay() );
-            }
-            if( iYm && oYm )
-            {
+     TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oYp),
+                                     routerYp->getInputInterfaz(iYp),
+                                     getConnectionDelay() );
+         TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oYp+4),
+                                     routerYp->getInputInterfaz(iYp+4),
+                                     getConnectionDelay() );
+      }
+      if( iYm && oYm )
+      {
 
-           TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oYm),
-                                           routerYm->getInputInterfaz(iYm),
-                                           getConnectionDelay() );
-               TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oYm+4),
-                                           routerYm->getInputInterfaz(iYm+4),
-                                           getConnectionDelay() );
-            }
-            if( iZp && oZp )
-            {
-               cerr << "THERE IS NOT SUPPORT FOR HALFDUPLEX 3D";
-            }
-            if( iZm && oZm )
-               TPZConnection::connectInterfaces( this,
-                                           router->getOutputInterfaz(oZm),
-                                           routerZm->getInputInterfaz(iZm),
-                                           getConnectionDelay() );
-        }
-    else
-    {
+     TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oYm),
+                                     routerYm->getInputInterfaz(iYm),
+                                     getConnectionDelay() );
+         TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oYm+4),
+                                     routerYm->getInputInterfaz(iYm+4),
+                                     getConnectionDelay() );
+      }
+      if( iZp && oZp )
+      {
+         cerr << "THERE IS NOT SUPPORT FOR HALFDUPLEX 3D";
+      }
+      if( iZm && oZm )
+         TPZConnection::connectInterfaces( this,
+                                     router->getOutputInterfaz(oZm),
+                                     routerZm->getInputInterfaz(iZm),
+                                     getConnectionDelay() );
+   }
+   else
+   {
         if (iXp && oXp)
         TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp),
                 routerXp->getInputInterfaz(iXp), getConnectionDelay() );

@@ -334,8 +334,7 @@ void TPZRouter::initialize() {
             TPZComponent* current = componentCursor.element();
             current->setRouter(this);
             current->setOwner(this);
-            current->initialize();
-
+            current->initialize(); // Anderson: if it is the router component, it will be set to initialized here. Doesn't know the reason.
         }
     }
     setInitializated(true);
@@ -1032,7 +1031,7 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
     } else if (injectorControl == TPZ_TAG_INJ_VNETS) {
         router->setInjectorType(TPZRouter::INJECT_VNET);
     } else if (injectorControl == TPZ_TAG_INJ_VC) {
-        router->setInjectorType(TPZRouter::INJECT_VC);
+        router->setInjectorType(TPZRouter::INJECT_VC);  // Anderson: baseline BLESS use it. It doesn't matter since BLESS only has a single injector. However, it may be changed to RROBIN by not setting anything for this tag.
     } else {
         router->setInjectorType(TPZRouter::INJECT_ROUND_ROBIN);
     }
@@ -1043,7 +1042,7 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
     TPZInterfaz** arrayInterfaz = new TPZInterfaz*[TPZ_MAX_NUMBER_OF_CV];
 
     while (nextTag && nextTag->tagName()!=endTag) {
-        if (nextTag->tagName() == TPZ_TAG_INPUT) {
+        if (nextTag->tagName() == TPZ_TAG_INPUT) { // Anderson: create input
             // This is an entry to the router (a wrapper)
 
             unsigned inputNumber = nextTag->tagId().asInteger();
@@ -1058,7 +1057,7 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
                 TPZString wIzda = TPZString::getStringLeftTo(tempWrapper, '.');
                 TPZString wDcha = TPZString::getStringRightTo(tempWrapper, '.');
                 unsigned wNumb = (wDcha==TPZString("")) ? 1 : wDcha.asInteger();
-                TPZComponent* comp = router->componentWithName(wIzda);
+                TPZComponent* comp = router->componentWithName(wIzda); // Anderson: Of course it is a router.
                 if ( !comp) {
                     TPZString err;
                     err.sprintf(ERR_TPZROUTE_002, (char*)wrapper);
@@ -1070,7 +1069,7 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
                     EXIT_PROGRAM(err);
                 }
 
-                arrayInterfaz[i-1] = comp->getInputInterfaz(wNumb);
+                arrayInterfaz[i-1] = comp->getInputInterfaz(wNumb); // Anderson: index of interfaz has to be exactly in sequence of the port.
                 i++;
             }
 
@@ -1083,7 +1082,8 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
 
             if ( !gData.routerIsInitializated() )
                 gData.routerInputsType()->setValueAt(inputNumber, _string2routingType(type));
-        } else if (nextTag->tagName() == TPZ_TAG_OUTPUT) {
+        } 
+        else if (nextTag->tagName() == TPZ_TAG_OUTPUT) { // Anderson: create output
             // This is a solution to the router (a wrapper)
 
 
@@ -1125,10 +1125,9 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
 
             if ( !gData.routerIsInitializated() )
                 gData.routerOutputsType()->setValueAt(outputNumber, _string2routingType(type));
-        } else {
+        } 
+        else { // Anderson: create other components.
             // It is a component
-
-
             TPZComponent* newComponent = TPZComponent::routerBuilder->
             parseComponentDefinition(nextTag, router, index);
             if (newComponent) {
@@ -1137,7 +1136,6 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
                 newComponent->initialize(); //build flowcontrol will be called.
                 router->addComponent(newComponent);
             }
-
         }
 
         nextTag = TPZComponent::routerBuilder->getTagWithIndex(++index);
@@ -1148,8 +1146,8 @@ TPZRouter* TPZRouter::newFrom(const TPZTag* tag, TPZComponent* owner,
 
     gData.routerSetInitializated();
 
-    router->initialize();
-    router->postInitialize();
+    router->initialize(); // Anderson: set owner and router of each components.
+    router->postInitialize(); // Anderson: dummy function at this moment.
 
     return router;
 }
