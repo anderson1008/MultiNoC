@@ -160,7 +160,8 @@ void TPZNetworkTorus :: initialize()
          }
       }
    }
-
+   
+   // Starting from here (remove each day)
    for( i=0; i<getSizeX(); i++ )
       for( j=0; j<getSizeY(); j++ )
       {
