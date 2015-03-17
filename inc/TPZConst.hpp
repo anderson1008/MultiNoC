@@ -147,6 +147,7 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
     _EXTERN _CONST TPZString TPZ_TAG_TORUSNET         _IS("TorusNetwork");
     _EXTERN _CONST TPZString TPZ_TAG_MIDIMEWNET       _IS("MidimewNetwork");
     _EXTERN _CONST TPZString TPZ_TAG_SQUAREMIDIMEWNET _IS("SquareMidimewNetwork");
+    _EXTERN _CONST TPZString TPZ_TAG_HETEROGENEOUS    _IS("HeterogeneousNetwork");
     _EXTERN _CONST TPZString TPZ_TAG_SIMULATION       _IS("Simulation");
     
     _EXTERN _CONST TPZString TPZ_TAG_XPLUS           _IS("X+");

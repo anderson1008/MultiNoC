@@ -41,119 +41,75 @@
 //
 //   The GNU General Public License is contained in the file LICENSE.
 //
-//     
+// 	
 //*************************************************************************
 //:
-//    File: TPZNetworkBuilder.cpp
+//    File: TPZNetworkHeterogeneous.hpp
 //
-//    Class:  TPZNetworkBuilder
+//    Class: 
 //
-//    Inherited from:  TPZBuilder
+//    Inherited from: 
 // :
 //*************************************************************************
 //end of header
 
 
-
-#include <TPZNetworkBuilder.hpp>
-
-#ifndef __TPZTag_HPP__
-#include <TPZTag.hpp>
-#endif
-
-#ifndef __TPZNetworkTorus_HPP__
-#include <TPZNetworkTorus.hpp>
-#endif
-
 #ifndef __TPZNetworkHeterogeneous_HPP__
-#include <TPZNetworkHeterogeneous.hpp>
+#define __TPZNetworkHeterogeneous_HPP__
+
+//*************************************************************************
+
+   #include <TPZNetwork.hpp>
+
+//*************************************************************************
+
+   class TPZNetworkBuilder;
+
+//*************************************************************************
+
+   class TPZNetworkHeterogeneous : public TPZNetwork
+   {
+      friend class TPZNetworkBuilder;
+      
+   public:
+      TPZNetworkHeterogeneous( const TPZComponentId& id,
+                       const TPZString& routerId,
+                       unsigned x, 
+                       unsigned y, 
+                       unsigned z=1 );
+      ~TPZNetworkHeterogeneous();
+
+      virtual void initialize();
+      virtual TPZString asString() const;
+      unsigned getDiameter() const;
+
+      virtual unsigned distance(const TPZPosition& src, const TPZPosition& dst);
+      virtual void     routingRecord( const TPZPosition& src,
+                                      const TPZPosition& dst,
+                                      int&  deltaX,
+                                      int&  deltaY,
+                                      int&  deltaZ,
+                                      Boolean ordered=false);
+     
+      virtual void generateDORMasks(TPZRouter* router);
+      
+      virtual unsigned long long setMulticastMask(const TPZPosition& current,
+                                         const TPZROUTINGTYPE& direction);
+                                  
+      // Run time information
+      DEFINE_RTTI(TPZNetworkHeterogeneous);
+   protected:                                      
+      virtual void initializeConnectionsFor(const TPZPosition& pos);    
+      
+   private:
+      static TPZNetworkHeterogeneous* newFrom(const TPZTag* tag, TPZComponent* owner);
+      
+   };
+
+//*************************************************************************
+
+
 #endif
-
-#ifndef __TPZNetworkMesh_HPP__
-#include <TPZNetworkMesh.hpp>
-#endif
-
-#ifndef __TPZNetworkMidimew_HPP__
-#include <TPZNetworkMidimew.hpp>
-#endif
-
-#ifndef __TPZNetworkSquareMidimew_HPP__
-#include <TPZNetworkSquareMidimew.hpp>
-#endif
-
-#ifndef __TPZConst_H__
-#include <TPZConst.hpp>
-#endif
-
-
-//*************************************************************************
-
-IMPLEMENT_RTTI_DERIVED(TPZNetworkBuilder,TPZBuilder);
-
-//*************************************************************************
-//:
-//  f: TPZNetworkBuilder (const TPZString & sgmlFile)
-//
-//  d:
-//:
-//*************************************************************************
-
-TPZNetworkBuilder :: TPZNetworkBuilder(const TPZString& sgmlFile)
-                   : TPZBuilder(sgmlFile)
-{
-
-}
-
-
-//*************************************************************************
-//:
-//  f: TPZComponent * parseComponentDefinition (TPZTag const * tag,
-//                                             TPZComponent * owner,
-//                                             INDEX & index);
-//
-//  d:
-//:
-//*************************************************************************
-
-TPZComponent* TPZNetworkBuilder::parseComponentDefinition( const TPZTag* tag,
-                                                           TPZComponent* owner,
-                                                           INDEX& index )
-{
-   TPZString tagName = tag->tagName();
-   TPZComponent* rComponent = 0;
-
-   if( tagName == TPZ_TAG_TORUSNET )
-   {
-      rComponent = TPZNetworkTorus::newFrom(tag,owner);
-   }
-   else if( tagName == TPZ_TAG_MESHNET )
-   {
-      rComponent = TPZNetworkMesh::newFrom(tag,owner);
-   }
-   else if (tagName == TPZ_TAG_MIDIMEWNET )
-   {
-      rComponent = TPZNetworkMidimew::newFrom(tag,owner);
-   }
-   else if (tagName == TPZ_TAG_SQUAREMIDIMEWNET )
-   {
-      rComponent = TPZNetworkSquareMidimew::newFrom(tag,owner);
-   }
-   else if (tagName = TPZ_TAG_HETEROGENEOUS)
-   {
-      rComponent = TPZNetworkHeterogeneous::newFrom(tag,owner);
-   }
-   else
-   {
-      TPZString err;
-      err.sprintf( ERR_TPZNBLDR_001, (char*)tagName );
-      EXIT_PROGRAM(err);
-   }
-
-   return rComponent;
-}
-
-
-//*************************************************************************
 
 
 // end of file

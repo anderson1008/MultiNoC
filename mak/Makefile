@@ -160,6 +160,7 @@ MODULES = TPZAttribute  \
           TPZNetworkMidimew \
 	  TPZNetworkSquareMidimew \
 	  TPZNetworkTorus \
+     TPZNetworkHeterogeneous \ 
           TPZNotifier \
           TPZObserver \
           TPZOptions   \

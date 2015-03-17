@@ -1,5 +1,6 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 <!--Simple Routers-->
+<HeterogeneousNetwork id="T44_BLESS_MULT_NOC" sizeX=4  sizeY=4  router="TORUS-BLESS-8In8Out" delay=0>
 
 <TorusNetwork id="T44_LIGERO" sizeX=4  sizeY=4  router="LIGERO" delay=0>
 <TorusNetwork id="T88_LIGERO" sizeX=8  sizeY=8  router="LIGERO" delay=0>
@@ -12,6 +13,7 @@
 <MeshNetwork id="M44_FAST_CT_NOC" sizeX=4  sizeY=4  router="MESH-CT-FAST-NOC" delay=0>
 <TorusNetwork id="T44_CT_NOC" sizeX=4  sizeY=4  router="TORUS-CT-NOC" delay=0>
 <TorusNetwork id="T44_BLESS_NOC" sizeX=4  sizeY=4  router="TORUS-BLESS" delay=0>
+
 <MeshNetwork id="M44-BINOC"   sizeX=4  sizeY=4  router="MESH-BINOC"   delay=0 operation="HALFDUPLEX">
 
 <MeshNetwork id="M66_CT_NOC" sizeX=6  sizeY=6  router="MESH-CT-NOC" delay=0>

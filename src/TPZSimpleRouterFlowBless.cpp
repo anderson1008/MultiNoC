@@ -162,7 +162,9 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
 
    unsigned outPort;
    unsigned inPort;
-
+   
+ 
+   
    cleanOutputInterfaces();
 
    //**********************************************************************************************************
@@ -228,11 +230,8 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    // PART2: Empty message queue
    // It must remain completely empty, every message must find an output port.
    //**********************************************************************************************************
-   // A: it may be changed later.
    // A: Here, the connection is released after sending each flit.
    // A: modify: each connection will be released at the unit of each packet.
-
-   // by Anderson
 
    for( outPort=1; outPort<=m_ports; outPort++)
    {
@@ -247,12 +246,17 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       Boolean outObtained=false;
       Boolean deflected=true;   // A: why deflect the flit by default?
 
+     /*
+     if (msg->getIdentifier() == 3 && msg->flitNumber() == 5)
+      {
+         cout << "Time is " << getOwnerRouter().getCurrentTime() << endl;
+         cout << "We are at " << getComponent().asString() << endl;
+      }
+      */
+      
       // A: try to find an available output port.
       for ( outPort = 1; outPort <= m_ports; outPort++)
       {
-         // A: try to allocate an available and productive port.
-         //    since PAB-NOC may have more than one productive port, getDeltaAbs may need to be redefined.
-
          if (getDeltaAbs(msg, outPort)==true && m_connEstablished[outPort]==false)
 	     {
 	        m_connEstablished[outPort]=true;
@@ -299,12 +303,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
         }
       }
 
-     if( msg->isTail() || msg->isHeadTail() || msg->isHeader() )
-     {
-         ((TPZNetwork*)(getOwnerRouter().getOwner()))->increHeadTailCount();
-     }
-     // end Anderson
-
+ 
       // A: This is just for precaution.
       if (outObtained==false)
       {
@@ -312,7 +311,6 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
          err.sprintf("%s :One message did not find output port", (char*)getComponent().asString() );
          EXIT_PROGRAM(err);
       }
-
 
    }
 
@@ -341,8 +339,13 @@ Boolean TPZSimpleRouterFlowBless :: getDeltaAbs(TPZMessage* msg, unsigned outPor
    texto4 += TPZString(((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort));
    TPZWRITE2LOG(texto4);
 #endif
-   // A: not sure if tipo is a function of outPort.
-   TPZROUTINGTYPE tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort);
+
+   TPZROUTINGTYPE tipo;
+   
+   //if (outPort > 4)
+   //   tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort-4);
+   //else
+      tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort);
 
    // A: check if "outPort" is the desired output port.
    // Return "true" is yes.
@@ -415,7 +418,12 @@ Boolean TPZSimpleRouterFlowBless :: updateMessageInfo(TPZMessage* msg, unsigned 
    // A: get the destination of the msg.
    TPZPosition destination=msg->destiny();
 
-   TPZROUTINGTYPE tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort);
+   TPZROUTINGTYPE tipo;
+   
+   //if (outPort > 4)
+   //   tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort-4);
+   //else
+      tipo=((TPZSimpleRouter&)getComponent()).getTypeForOutput(outPort);
 
    // A: update the position of next hop based on the routing algorithm
    switch(tipo)

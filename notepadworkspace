@@ -230,5 +230,9 @@
         <File name="sgm\Simula.sgm" />
         <File name="sgm\Simula3D.sgm" />
         <File name="sgm\SimulaGem5.sgm" />
+        <File name="mak\Makefile" />
+        <File name="sgm\TestRouter.sgm" />
+        <File name="inc\TPZNetworkHeterogeneous.hpp" />
+        <File name="src\TPZNetworkHeterogeneous.cpp" />
     </Project>
 </NotepadPlus>

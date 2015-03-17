@@ -44,9 +44,9 @@
 //
 //*************************************************************************
 //:
-//    File: TPZNetworkTorus.cpp
+//    File: TPZNetworkHeterogeneous.cpp
 //
-//    Class:  TPZNetworkTorus
+//    Class:  TPZNetworkHeterogeneous
 //
 //    Inherited from:  TPZNetwork
 // :
@@ -56,11 +56,7 @@
 
 
 
-#include <TPZNetworkTorus.hpp>
-
-#ifndef __TPZNetworkMesh_HPP__
-#include <TPZNetworkMesh.hpp>
-#endif
+#include <TPZNetworkHeterogeneous.hpp>
 
 #ifndef __TPZConnection_HPP__
 #include <TPZConnection.hpp>
@@ -80,11 +76,11 @@
 
 //*************************************************************************
 
-IMPLEMENT_RTTI_DERIVED(TPZNetworkTorus,TPZNetwork);
+IMPLEMENT_RTTI_DERIVED(TPZNetworkHeterogeneous,TPZNetwork);
 
 //*************************************************************************
 //:
-//  f: TPZNetworkTorus (const TPZComponentId & id,
+//  f: TPZNetworkHeterogeneous (const TPZComponentId & id,
 //                      const TPZString & RouterOS,
 //                      unsigned x,
 //                      unsigned and
@@ -94,7 +90,7 @@ IMPLEMENT_RTTI_DERIVED(TPZNetworkTorus,TPZNetwork);
 //:
 //*************************************************************************
 
-TPZNetworkTorus :: TPZNetworkTorus( const TPZComponentId& id,
+TPZNetworkHeterogeneous :: TPZNetworkHeterogeneous( const TPZComponentId& id,
                                     const TPZString& routerId,
                                     unsigned x,
                                     unsigned y,
@@ -108,15 +104,76 @@ TPZNetworkTorus :: TPZNetworkTorus( const TPZComponentId& id,
 
 //*************************************************************************
 //:
-//  f: virtual ~ TPZNetworkTorus ();
+//  f: virtual ~ TPZNetworkHeterogeneous ();
 //
 //  d:
 //:
 //*************************************************************************
 
-TPZNetworkTorus :: ~TPZNetworkTorus()
+TPZNetworkHeterogeneous :: ~TPZNetworkHeterogeneous()
 {
 
+}
+
+
+void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
+{
+
+    TPZRouter* router = getRouterAt(pos);
+    TPZRouter* routerXp = getRouterAt(positionOf(_Xplus_, pos) );
+    TPZRouter* routerXm = getRouterAt(positionOf(_Xminus_, pos) );
+    TPZRouter* routerYp = getRouterAt(positionOf(_Yplus_, pos) );
+    TPZRouter* routerYm = getRouterAt(positionOf(_Yminus_, pos) );
+    TPZRouter* routerZp = getRouterAt(positionOf(_Zplus_, pos) );
+    TPZRouter* routerZm = getRouterAt(positionOf(_Zminus_, pos) );
+   
+   
+    unsigned iXp = router->getInputWithType(_Xplus_);
+    unsigned iXm = router->getInputWithType(_Xminus_);
+    unsigned iYp = router->getInputWithType(_Yplus_);
+    unsigned iYm = router->getInputWithType(_Yminus_);
+    unsigned iZp = router->getInputWithType(_Zplus_);
+    unsigned iZm = router->getInputWithType(_Zminus_);
+
+    unsigned oXp = router->getInputWithType(_Xplus_);
+    unsigned oXm = router->getInputWithType(_Xminus_);
+    unsigned oYp = router->getInputWithType(_Yplus_);
+    unsigned oYm = router->getInputWithType(_Yminus_);
+    unsigned oZp = router->getInputWithType(_Zplus_);
+    unsigned oZm = router->getInputWithType(_Zminus_);
+
+   if (iXp && oXp)
+   {
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp),
+         routerXp->getInputInterfaz(iXp), getConnectionDelay() );
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp+4),
+            routerXp->getInputInterfaz(iXp+4), getConnectionDelay() );
+   }            
+         
+   if (iXm && oXm)
+   {
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXm),
+          routerXm->getInputInterfaz(iXm), getConnectionDelay() );
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXm+4),
+          routerXm->getInputInterfaz(iXm+4), getConnectionDelay() );
+   }
+
+   if (iYp && oYp)
+   {
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYp),
+          routerYp->getInputInterfaz(iYp), getConnectionDelay() );
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYp+4),
+          routerYp->getInputInterfaz(iYp+4), getConnectionDelay() );
+   }         
+
+   if (iYm && oYm)
+   {
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYm),
+          routerYm->getInputInterfaz(iYm), getConnectionDelay() );
+      TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYm+4),
+          routerYm->getInputInterfaz(iYm+4), getConnectionDelay() );
+   }       
+  
 }
 
 
@@ -128,7 +185,7 @@ TPZNetworkTorus :: ~TPZNetworkTorus()
 //:
 //*************************************************************************
 
-void TPZNetworkTorus :: initialize()
+void TPZNetworkHeterogeneous :: initialize()
 {
    if( isInitializated() ) return;
 
@@ -183,7 +240,7 @@ void TPZNetworkTorus :: initialize()
 //:
 //*************************************************************************
 
-unsigned TPZNetworkTorus :: distance(const TPZPosition& org, const TPZPosition& dst)
+unsigned TPZNetworkHeterogeneous :: distance(const TPZPosition& org, const TPZPosition& dst)
 {
    int deltaX, deltaY, deltaZ;
    routingRecord(org,dst,deltaX,deltaY,deltaZ);
@@ -205,7 +262,7 @@ unsigned TPZNetworkTorus :: distance(const TPZPosition& org, const TPZPosition& 
 //:
 //*************************************************************************
 
-void TPZNetworkTorus :: routingRecord( const TPZPosition& org,
+void TPZNetworkHeterogeneous :: routingRecord( const TPZPosition& org,
                                        const TPZPosition& dst,
                                        int&  deltaX,
                                        int&  deltaY,
@@ -266,13 +323,13 @@ void TPZNetworkTorus :: routingRecord( const TPZPosition& org,
 
 //*************************************************************************
 //:
-//  f: static TPZNetworkTorus * newFrom (TPZTag const * tag, TPZComponent * owner);
+//  f: static TPZNetworkHeterogeneous * newFrom (TPZTag const * tag, TPZComponent * owner);
 //
 //  d:
 //:
 //*************************************************************************
 
-TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
+TPZNetworkHeterogeneous* TPZNetworkHeterogeneous :: newFrom( const TPZTag* tag,
                                              TPZComponent* owner )
 {
    TPZComponentId idNetwork(*tag);
@@ -318,7 +375,7 @@ TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
    TPZString operationMode;
    unsigned delay=0;
 
-   TPZNetworkTorus* net;
+   TPZNetworkHeterogeneous* net;
    if( tag->getAttributeValueWithName(TPZ_TAG_CHANNEL_MODE, operationMode) )
    {
       cout << operationMode << " mode building...\n";
@@ -327,13 +384,9 @@ TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
    {
       delay = connectionDelay.asInteger();
    }
-   if(tag->tagName()==TPZ_TAG_TORUSNET)
+   if(tag->tagName()==TPZ_TAG_HETEROGENEOUS)
    {
-      net = new TPZNetworkTorus( idNetwork, routerId, x, y, z ); // Anderson: Torus network is created here.
-   }
-   else if(tag->tagName()==TPZ_TAG_MESHNET)
-   {
-      net = new TPZNetworkMesh( idNetwork, routerId, x, y, z ); 
+      net = new TPZNetworkHeterogeneous( idNetwork, routerId, x, y, z ); // Anderson: Torus network is created here.
    }
    else
    {
@@ -359,7 +412,7 @@ TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
 //  d:
 //:
 //*************************************************************************
- unsigned TPZNetworkTorus::getDiameter() const
+ unsigned TPZNetworkHeterogeneous::getDiameter() const
 {
    unsigned maximo;
    unsigned dimension;
@@ -386,7 +439,7 @@ TPZNetworkTorus* TPZNetworkTorus :: newFrom( const TPZTag* tag,
 //:
 //*************************************************************************
 
-TPZString TPZNetworkTorus :: asString() const
+TPZString TPZNetworkHeterogeneous :: asString() const
 {
    TPZGlobalData& data = ((TPZSimulation*)getSimulation())->globalData();
    TPZString rs= "Torus(";
@@ -398,6 +451,11 @@ TPZString TPZNetworkTorus :: asString() const
    return rs;
 }
 
+
+//*************************************************************************
+
+
+
 //*************************************************************************
 //:
 //  f: void generateDORMasks()
@@ -405,7 +463,7 @@ TPZString TPZNetworkTorus :: asString() const
 //  d:
 //:
 //*************************************************************************
-void TPZNetworkTorus::generateDORMasks(TPZRouter* router)
+void TPZNetworkHeterogeneous::generateDORMasks(TPZRouter* router)
 {
     TPZPosition pos=router->getPosition();
 
@@ -501,7 +559,7 @@ void TPZNetworkTorus::generateDORMasks(TPZRouter* router)
 //     X indicates that the node is accessible from the port of departure.
 //:
 //*************************************************************************
-unsigned long long TPZNetworkTorus :: setMulticastMask(const TPZPosition& current,
+unsigned long long TPZNetworkHeterogeneous :: setMulticastMask(const TPZPosition& current,
                                         const TPZROUTINGTYPE& direction)
 {
 
@@ -576,7 +634,5 @@ switch (direction)
  return Mascara;
 }
 
-
-//*************************************************************************
 
 // end of file

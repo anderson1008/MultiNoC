@@ -717,13 +717,16 @@ Boolean TPZNetwork::sendMessage(TPZMessage* msg) {
     {
        msg->setGenerationTime(getCurrentTime());
     }
+    
+     TPZMessage::assignUniqueId(msg);
+     
 #ifndef NO_TRAZA
 
 #ifdef PTOPAZ
    pthread_mutex_lock(&m_MessagesKey);  //To avoid multiple messages with same ID. May be avoidable but some routing uses this ids for work
 #endif
 
-    TPZMessage::assignUniqueId(msg);
+   
 
 #ifdef PTOPAZ
    pthread_mutex_unlock(&m_MessagesKey);
