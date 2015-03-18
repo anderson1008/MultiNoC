@@ -737,7 +737,7 @@ Boolean TPZNetwork::sendMessage(TPZMessage* msg) {
     unsigned indice= msg->getVnet();
     incrProtocolMessagesTx(unsigned(indice));
 
-    router->sendMessage(msg);
+    router->sendMessage(msg); // put a generated message into message pool.
 
     incrementTx(Message);
     incrementTx(Packet, msg->messageSize());

@@ -88,8 +88,9 @@
       // Run time information
       DEFINE_RTTI(TPZConsumerFlowBless);
    
-   protected:
-      TPZAssemblyQueue m_AssemblyQueue;
+   // Removed for Multi-NOC
+   // protected:
+   //   TPZAssemblyQueue m_AssemblyQueue;
 
 };
 

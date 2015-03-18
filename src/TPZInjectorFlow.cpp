@@ -222,7 +222,7 @@ Boolean TPZInjectorFlow :: outputWriting()
 
 void TPZInjectorFlow :: sendMessage(TPZMessage* msg)
 {
-
+   // Anderson: injection for BLESS NOC
    TPZNetwork* net = ((TPZSimulation*)(getComponent().getSimulation()))->getNetwork();
    unsigned radioX = net->getSizeX();
    unsigned radioY = net->getSizeY();
@@ -240,7 +240,7 @@ void TPZInjectorFlow :: sendMessage(TPZMessage* msg)
      if (msg->getExternalInfo()!=0) pthread_mutex_lock(&m_QueueKey); 
 #endif
 
-     m_MessageQueue.enqueue(msg); 
+     m_MessageQueue.enqueue(msg);  // Anderson: enqueue the generated message in the selected injector.
 #ifndef NO_TRAZA
         uTIME delayTime = getOwnerRouter().getCurrentTime() ;
         TPZString texto = getComponent().asString() + " ENQUEUE. TIME = ";

@@ -378,7 +378,15 @@ void TPZRouter::sendMessage(TPZMessage* msg) {
     //Designed for indirect and irregular networks.
     //Obviously direct networks have at least one host
     //connected
-
+    
+    
+    /*
+      By Anderson:
+      Currently, only one flit can be injected to each router at each cycle.
+      So, for fair comparison in Multi-NOC, p_mult = 2 x p_reg, where p_mult is the injection
+      rate of Multi-NOC and p_reg is the injection rate of the regular network with the same bandwidth. 
+      Here, p_mult and p_reg are injection rate specified through tag -p. 
+    */
     if (injector) {
         injector->sendMessage(msg);
     }

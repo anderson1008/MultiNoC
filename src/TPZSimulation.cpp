@@ -287,6 +287,8 @@ void TPZSimulation :: setLoadSupply(double value)
 
 void TPZSimulation :: setLoadProb(double value)
 {
+   // Anderson:
+   // -p tag value will be read into here.
    unsigned realPacketLegth=m_PacketLength;
 
    if(getTrafficPattern()->isBimodal() && getTrafficPattern()->getMessagesBimodal()<1)
@@ -295,6 +297,7 @@ void TPZSimulation :: setLoadProb(double value)
    }
    double probMCast=getTrafficPattern()->getProbMulticast();
    double lengthMCast=getTrafficPattern()->getLengthMulticast();
+   // m_q is the injection rate in flits
    m_q=value*(1-probMCast)/realPacketLegth+value*probMCast/(lengthMCast*realPacketLegth); //unicast + broadcast component
 
 }
@@ -475,22 +478,22 @@ void TPZSimulation :: run(uTIME time)
           //BurstMode Emulation.
           if( (m_Clock > m_StopSimulation || m_StopSimulMessages==0) && m_isRafagaMode)
           {
-                //double check (much Heavier than previous)
-                if(getNetwork()->getMessagesTx()-getNetwork()->getMessagesRx()
-                +m_Network->getMessagesToTx()==0 )
+             //double check (much Heavier than previous)
+             if(getNetwork()->getMessagesTx()-getNetwork()->getMessagesRx()
+             +m_Network->getMessagesToTx()==0 )
+             {
+                if( getBurstRepet()!=1 )
                 {
-                   if( getBurstRepet()!=1 )
-                   {
-                      unsigned pending=getBurstRepet()-1;
-                      setBurstRepet(pending);
-                      setStopSimulation(m_Clock+getBurstWidth());
-                   }
-                   else
-                   if(m_Clock>=100)
-                   {
-                      m_SimulationCycles=m_Clock;
-                   }
+                   unsigned pending=getBurstRepet()-1;
+                   setBurstRepet(pending);
+                   setStopSimulation(m_Clock+getBurstWidth());
                 }
+                else
+                if(m_Clock>=100)
+                {
+                   m_SimulationCycles=m_Clock;
+                }
+             }
          }//END BURST
 
          if( m_Clock <= m_StopSimulation )

@@ -141,7 +141,12 @@ void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
     unsigned oYm = router->getInputWithType(_Yminus_);
     unsigned oZp = router->getInputWithType(_Zplus_);
     unsigned oZm = router->getInputWithType(_Zminus_);
-
+   
+   /*
+      Inter-router connections are formed here.
+      The internal connections are formed in router.sgm file.
+   */
+   
    if (iXp && oXp)
    {
       TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp),

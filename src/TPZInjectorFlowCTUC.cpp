@@ -120,7 +120,7 @@ TPZInjectorFlowCTUC :: ~TPZInjectorFlowCTUC()
 
 void TPZInjectorFlowCTUC :: sendMessage(TPZMessage* msg)
 {
-
+   // Anderson: injection for BLESS NOC
    TPZNetwork* net = ((TPZSimulation*)(getComponent().getSimulation()))->getNetwork();
    unsigned radioX = net->getSizeX();
    unsigned radioY = net->getSizeY();
@@ -157,7 +157,7 @@ void TPZInjectorFlowCTUC :: sendMessage(TPZMessage* msg)
    }
    else
    {        
-       Inhereited::sendMessage(msg);
+       Inhereited::sendMessage(msg); // For BLESS, invoke TPZInjectorFlow::sendMessage.
    }
 }
 

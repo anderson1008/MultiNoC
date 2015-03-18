@@ -117,7 +117,13 @@ TPZConsumerFlowBless :: ~TPZConsumerFlowBless()
    
 }
 
-
+/*
+   Modified by Anderson 
+   Now, multiple consumer will share the same reassemblyQueue.
+*/
+TPZAssemblyQueue my_AssemblyQueue;
+TPZAssemblyQueue::Cursor cursor(my_AssemblyQueue);
+// end Anderson
 
 //*************************************************************************
 //:
@@ -126,6 +132,7 @@ TPZConsumerFlowBless :: ~TPZConsumerFlowBless()
 //  d:
 //:
 //*************************************************************************
+
 
 Boolean TPZConsumerFlowBless :: stateChange()
 {
@@ -146,7 +153,8 @@ Boolean TPZConsumerFlowBless :: stateChange()
          EXIT_PROGRAM(err);
       }
       
-      TPZAssemblyQueue::Cursor cursor(m_AssemblyQueue);
+      // removed for Multi-NOC
+      //TPZAssemblyQueue::Cursor cursor(m_AssemblyQueue); 
       Boolean found=false;
       unsigned AssemblySize=0;
       
@@ -175,7 +183,7 @@ Boolean TPZConsumerFlowBless :: stateChange()
 	    tempNew.setLeft(temp.left());
 	    tempNew.setRight(temp.right()-1);
 	    cursor.remove();
-	    m_AssemblyQueue.add(tempNew);
+	    my_AssemblyQueue.add(tempNew);
 	    found=true;
 	    break;
 	 }
@@ -192,7 +200,7 @@ Boolean TPZConsumerFlowBless :: stateChange()
          assemblyPair temp2;
 	 temp2.setLeft(m_InputData->getIdentifier());
 	 temp2.setRight(m_InputData->packetSize()-1);
-	 m_AssemblyQueue.add(temp2);
+	 my_AssemblyQueue.add(temp2);
       }
       //***********************************************************************
       // Any message completed??

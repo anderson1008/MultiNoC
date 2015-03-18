@@ -133,6 +133,7 @@ void TPZSimpleRouterFlowBless :: initialize()
    setCleanInterfaces(true);
 }
 
+unsigned NUM_LOCAL_PORT = 2;
 
 //*************************************************************************
 //:
@@ -171,7 +172,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    // PART1: move through all the sync (except injection, which has special treatment).
    // Put every message arrived into the only queue, ordered according to their priority (age)
    //**********************************************************************************************************
-   for( inPort = 1; inPort < m_ports; inPort++)
+   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT; inPort++)
    {
       // If there is a message at sync,
       if(m_sync[inPort])
@@ -195,37 +196,47 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    //    The injection queue should reside in NI.
    //    bypass may be added here.
    // Those comming from injection only move forward if one input port is free
-   //*********************************************************************************************************
-   if(m_sync[m_ports])
+   //********************************************************************************************************
+   
+   // queue the flit with large index first
+   // so if there are two flits in the injectionQ, the head flit is from the port with small index
+   for (int i=0; i< NUM_LOCAL_PORT; i++)
    {
-      m_injectionQueue.enqueue(m_sync[m_ports]);
-      #ifndef NO_TRAZA
-		   TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
-		   texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(inPort) + m_sync[inPort]->asString() ;
-		   TPZWRITE2LOG(texto2);
-
-       #endif
-      m_sync[inPort]=0;
+      if(m_sync[m_ports-i])
+      {
+         m_injectionQueue.enqueue(m_sync[m_ports-i]);
+         #ifndef NO_TRAZA
+         TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
+         texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(m_ports-i) + m_sync[m_ports-i]->asString() ;
+         TPZWRITE2LOG(texto2);
+         #endif
+         m_sync[m_ports-i]=0;
+      }  
    }
-
-    // Anderson: allow injection if #_arrival_input < #_port - 1; (make sure no deadlock)
-   if( (m_priorityQueue.numberOfElements() < (m_ports-1)) && (m_injectionQueue.numberOfElements() !=0) )
+   
+   /*
+      allow injection if #_arrival_input < #_port - #_localPort; (make sure no deadlock
+   */
+   
+   for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
    {
-     TPZMessage* msg;
-     m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
-     uTIME timeGen=msg->generationTime();
-     m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
-     // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since
-     //           msg is only retrieved from the head of a shared priorityQueue.
-
-
+      // remove flit with small index first.
+      if( (m_priorityQueue.numberOfElements() < (m_ports-2)) && (m_injectionQueue.numberOfElements() !=0) )
+      {
+        TPZMessage* msg;
+        m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
+        uTIME timeGen=msg->generationTime();
+        m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
+        // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since msg is only retrieved from the head of a shared priorityQueue.
+      }     
+       
+      if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports-i)->sendStopRightNow();
+      else inputInterfaz(m_ports-i)->clearStopRightNow();
    }
+      
 
-    // Anderson: probably, if the injection condition is not satisfied,
-    //           need to stop injection by sending STOP to the local interfaz.
-   if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports)->sendStopRightNow();
-   else inputInterfaz(m_ports)->clearStopRightNow();
-
+ 
+   
    //**********************************************************************************************************
    // PART2: Empty message queue
    // It must remain completely empty, every message must find an output port.
@@ -278,12 +289,16 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
 	        break;
 	      }
        }
-
-      // A: did not find an available output port. Deflection occurs.
-      //    In this case, deflect the flit to an unallocated port.
+      
+      /*
+         did not find an available output port. Deflection occurs.
+         In this case, deflect the flit to an unallocated port.
+         Notice that, deflect to consumers is not accepted.
+         So, be aware of the outPort range.
+      */
       if (deflected==true)
       {
-         for ( outPort = 1; outPort < m_ports; outPort++)
+         for ( outPort = 1; outPort <= m_ports-2; outPort++)
          {
             if (m_connEstablished[outPort]==false)
             {

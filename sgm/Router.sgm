@@ -3,10 +3,12 @@
 
 <Router id="TORUS-BLESS-8In8Out" inputs=8 outputs=8 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
    
-   <Injector id="INJ" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
-   <Consumer id="CONS" typeCons="BLESS" >
+   <Injector id="INJ1" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ2" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Consumer id="CONS1" typeCons="BLESS" >
+   <Consumer id="CONS2" typeCons="BLESS" >
    
-   <SimpleRouter id="ROUTER" inputs="9" outputs="9" headerDelay=0 dataDelay=0 vnets=4>
+   <SimpleRouter id="ROUTER" inputs="10" outputs="10" headerDelay=0 dataDelay=0 vnets=1>
       <Input  id=1  type="X+">
       <Input  id=2  type="X-">
       <Input  id=3  type="Y+">
@@ -15,7 +17,8 @@
       <Input  id=6  type="X-">
       <Input  id=7  type="Y+">
       <Input  id=8  type="Y-">
-      <Input  id=9  type="Node">     
+      <Input  id=9  type="Node"> 
+      <Input  id=10 type="Node">
       <Output id=1  type="X+">
       <Output id=2  type="X-">
       <Output id=3  type="Y+">
@@ -25,10 +28,13 @@
       <Output id=7  type="Y+">
       <Output id=8  type="Y-">
       <Output id=9  type="Node">    
+      <Output id=10 type="Node">    
    </SimpleRouter>
    
-   <Connection id="C01" source="INJ" destiny="ROUTER.9">
-   <Connection id="C02" source="ROUTER.9" destiny="CONS">  
+   <Connection id="C01" source="INJ1" destiny="ROUTER.9">
+   <Connection id="C02" source="INJ2" destiny="ROUTER.10">
+   <Connection id="C03" source="ROUTER.9" destiny="CONS1">  
+   <Connection id="C04" source="ROUTER.10" destiny="CONS2">  
    
    <Input id="1" type="X+"   wrapper="ROUTER.1">
    <Input id="2" type="X-"   wrapper="ROUTER.2">
@@ -279,7 +285,7 @@
    <Injector id="INJ" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
    <Consumer id="CONS" typeCons="BLESS" >
    
-   <SimpleRouter id="ROUTER" inputs="5" outputs="5" headerDelay=0 dataDelay=0 vnets=4>
+   <SimpleRouter id="ROUTER" inputs="5" outputs="5" headerDelay=0 dataDelay=0 vnets=1>
       <Input  id=1  type="X+">
       <Input  id=2  type="X-">
       <Input  id=3  type="Y+">

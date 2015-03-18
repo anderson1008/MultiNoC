@@ -160,18 +160,18 @@ void TPZTrafficPattern::generateMessages(double q)
    for (register int i=0; i<m_SizeX; i++)
       for (register int j=0; j<m_SizeY; j++)
          for (register int k=0; k<m_SizeZ; k++) 
-	 {
+         {
             TPZPosition pos(i, j, k);
             if (getSimulation().getisRafagaMode()) 
-	    {
+            {
                if (drand48() < getInjectFactor(pos)*q && getSimulation().getStopSimulMessages()!=0) 
                {
-                  injectMessage(pos);
-                  getSimulation().decrStopSimulMessages();
+               injectMessage(pos);
+               getSimulation().decrStopSimulMessages();
                }
             } 
-	    else 
-	    {
+            else 
+            {
                if (drand48() < getInjectFactor(pos)*q) 
                {
                   injectMessage(pos);
@@ -249,34 +249,33 @@ TPZMessage* TPZTrafficPattern::generateBasicMessage(const TPZPosition& source)
       if (drand48()<m_ProbMulticast)
       {
          unsigned srcX= source.valueForCoordinate(TPZPosition::X);
-	 unsigned srcY= source.valueForCoordinate(TPZPosition::Y);
-	 unsigned srcZ= source.valueForCoordinate(TPZPosition::Z);
-	 unsigned sizex=getSimulation().getNetwork()->getSizeX();
+         unsigned srcY= source.valueForCoordinate(TPZPosition::Y);
+         unsigned srcZ= source.valueForCoordinate(TPZPosition::Z);
+         unsigned sizex=getSimulation().getNetwork()->getSizeX();
          unsigned sizey=getSimulation().getNetwork()->getSizeY();
-	 unsigned sizez=getSimulation().getNetwork()->getSizeZ();
+         unsigned sizez=getSimulation().getNetwork()->getSizeZ();
          unsigned Numnodes= sizex*sizey*sizez;
          unsigned absPos= srcZ*sizex*sizey+srcY*sizex+srcX;
-	 unsigned long long masksrc=1;
-	 masksrc= masksrc << absPos;
-	 message->setMulticast();
+         unsigned long long masksrc=1;
+         masksrc= masksrc << absPos;
+         message->setMulticast();
          unsigned long long mask=0;
           
          //Random multicast destination
          unsigned counter=m_LengthMulticast;
-	 do
-	 {
-	    unsigned candidate=(rand())%Numnodes;
-	    unsigned long long maskaux=1;
+         do
+         {
+            unsigned candidate=(rand())%Numnodes;
+            unsigned long long maskaux=1;
             maskaux= maskaux << candidate;
-	    if ( (maskaux & mask)==0 && (maskaux & masksrc)==0 ) 
-	    {
-	       //This destination was not previously selected and is different to src
-	       mask=mask|maskaux;
-	       counter--;		
-	    }
-	 }
-	 while (counter!=0);
-	  
+            if ( (maskaux & mask)==0 && (maskaux & masksrc)==0 ) 
+            {
+            //This destination was not previously selected and is different to src
+            mask=mask|maskaux;
+            counter--;		
+            }
+         }
+         while (counter!=0);   
          message->setMsgmask(mask);
          message->setPacketSize(1);
        }
