@@ -169,6 +169,7 @@ TPZROUTINGTYPE _string2routingType(const TPZString& string)
    else if( string == TPZ_TAG_ZPLUS )  return _Zplus_;
    else if( string == TPZ_TAG_ZMINUS ) return _Zminus_;
    else if( string == TPZ_TAG_LOCAL )  return _LocalNode_;
+   else if( string == TPZ_TAG_BYPASS ) return _ByPass_;
    
    return _Unknow_;
 }

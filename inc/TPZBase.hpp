@@ -79,13 +79,14 @@
    typedef unsigned long uTIME;
    typedef unsigned Boolean;
    typedef unsigned int INDEX;
-   typedef enum{ _LocalNodeGNP_ = -1,
+   typedef enum{ _LocalNodeGNP_ = -1,  // The order of these enum type matters.
                  _Unknow_,
                  _Xplus_,
                  _Xminus_,
                  _Yplus_,
                  _Yminus_,
-                 _LocalNode_,
+                 _ByPass_, // added by Anderson for Multi-NOC support
+                 _LocalNode_,               
                  _Zplus_,
                  _Zminus_,
                  _ABPlus_,

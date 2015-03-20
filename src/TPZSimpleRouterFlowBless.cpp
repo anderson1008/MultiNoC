@@ -297,8 +297,29 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
          So, be aware of the outPort range.
       */
       if (deflected==true)
-      {
+      {  
+         /*
          for ( outPort = 1; outPort <= m_ports-NUM_LOCAL_PORT; outPort++)
+         {
+            if (m_connEstablished[outPort]==false)
+            {
+                m_connEstablished[outPort]=true;
+                updateMessageInfo(msg, outPort);
+                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
+                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
+                outputInterfaz(outPort)->sendData(msg);
+                #ifndef NO_TRAZA
+                    TPZString texto4 = getComponent().asString() + " Deflected TIME = ";
+                    texto4 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
+                    TPZWRITE2LOG(texto4);
+                #endif
+                outObtained=true;
+                break;
+            }
+        }
+        
+        */
+        for ( outPort = m_ports-NUM_LOCAL_PORT; outPort >= 1; outPort--)
          {
             if (m_connEstablished[outPort]==false)
             {
@@ -390,10 +411,14 @@ Boolean TPZSimpleRouterFlowBless :: getDeltaAbs(TPZMessage* msg, unsigned outPor
          if (deltaZ<-1) return true;
 	     else return false;
 	     break;
+      case _ByPass_:  // During port allocation, this bypass will not be selected.
+         return false;
+        break;       
       case _LocalNode_:
          if ( (deltaX==1 || deltaX==-1) && (deltaY==1 || deltaY==-1) && (deltaZ==1 || deltaZ==-1) ) return true;
 	     else return false;
 	     break;
+
 
       default:
          TPZString err;
@@ -470,6 +495,10 @@ Boolean TPZSimpleRouterFlowBless :: updateMessageInfo(TPZMessage* msg, unsigned 
       case _LocalNode_:
          msg->setRoutingPort(_LocalNode_);
 	     break;
+      case _ByPass_:  // In this case, the value of delta does not update.
+         msg->setRoutingPort(_ByPass_);
+        break;  
+        
       default:
          TPZString err;
 	     err.sprintf("%s :output port out of range", (char*)getComponent().asString() );

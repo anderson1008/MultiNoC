@@ -157,6 +157,7 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
     _EXTERN _CONST TPZString TPZ_TAG_ZPLUS           _IS("Z+");
     _EXTERN _CONST TPZString TPZ_TAG_ZMINUS          _IS("Z-");
     _EXTERN _CONST TPZString TPZ_TAG_LOCAL           _IS("Node");
+    _EXTERN _CONST TPZString TPZ_TAG_BYPASS          _IS("Bypass");
 
     _EXTERN _CONST TPZString ICL_TAG_BUBBLE_SIZE     _IS("bubbleSize");
     _EXTERN _CONST TPZString TPZ_TAG_WIDE_MEM        _IS("wideMemory");
