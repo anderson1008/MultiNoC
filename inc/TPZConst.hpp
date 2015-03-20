@@ -99,6 +99,24 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
    //**********************************************************************
    // Router Description
    //**********************************************************************
+   
+   
+   /*
+      Multi-NOC Support
+   */
+   _EXTERN _CONST TPZString TPZ_TAG_REPLICA           _IS("replica");
+   _EXTERN _CONST TPZString TPZ_TAG_HETEROGENEOUS     _IS("HeterogeneousNetwork");
+   _EXTERN _CONST TPZString TPZ_TAG_BYPASS            _IS("Bypass");
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    _EXTERN _CONST TPZString TPZ_TAG_INPUT            _IS("Input");         //Router ports, connect each router with
    _EXTERN _CONST TPZString TPZ_TAG_OUTPUT           _IS("Output");        //its neighbours
    
@@ -147,9 +165,9 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
     _EXTERN _CONST TPZString TPZ_TAG_TORUSNET         _IS("TorusNetwork");
     _EXTERN _CONST TPZString TPZ_TAG_MIDIMEWNET       _IS("MidimewNetwork");
     _EXTERN _CONST TPZString TPZ_TAG_SQUAREMIDIMEWNET _IS("SquareMidimewNetwork");
-    _EXTERN _CONST TPZString TPZ_TAG_HETEROGENEOUS    _IS("HeterogeneousNetwork");
-    _EXTERN _CONST TPZString TPZ_TAG_SIMULATION       _IS("Simulation");
     
+    _EXTERN _CONST TPZString TPZ_TAG_SIMULATION       _IS("Simulation");
+        
     _EXTERN _CONST TPZString TPZ_TAG_XPLUS           _IS("X+");
     _EXTERN _CONST TPZString TPZ_TAG_XMINUS          _IS("X-");
     _EXTERN _CONST TPZString TPZ_TAG_YPLUS           _IS("Y+");
@@ -157,7 +175,7 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
     _EXTERN _CONST TPZString TPZ_TAG_ZPLUS           _IS("Z+");
     _EXTERN _CONST TPZString TPZ_TAG_ZMINUS          _IS("Z-");
     _EXTERN _CONST TPZString TPZ_TAG_LOCAL           _IS("Node");
-    _EXTERN _CONST TPZString TPZ_TAG_BYPASS          _IS("Bypass");
+    
 
     _EXTERN _CONST TPZString ICL_TAG_BUBBLE_SIZE     _IS("bubbleSize");
     _EXTERN _CONST TPZString TPZ_TAG_WIDE_MEM        _IS("wideMemory");
@@ -165,7 +183,7 @@ _EXTERN _CONST TPZString TPZ_TAG_INI_SIMULATION  _IS("SimulationFile");
     _EXTERN _CONST TPZString TPZ_TAG_SIZE            _IS("size");
     _EXTERN _CONST TPZString TPZ_TAG_SIZE_SHORT      _IS("sizeShort");
     _EXTERN _CONST TPZString TPZ_TAG_CONTROL         _IS("control");
-    _EXTERN _CONST TPZString TPZ_TAG_INPUTS          _IS("inputs"); // Anderson: any different with "input" (singular)
+    _EXTERN _CONST TPZString TPZ_TAG_INPUTS          _IS("inputs"); // Anderson: any different with "input" (singular)?
     _EXTERN _CONST TPZString TPZ_TAG_OUTPUTS         _IS("outputs");
     _EXTERN _CONST TPZString TPZ_TAG_BUFFER_SIZE     _IS("bufferSize");
     _EXTERN _CONST TPZString TPZ_TAG_MULTIPORT_SIZE  _IS("multiportSize");    

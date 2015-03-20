@@ -128,7 +128,7 @@
       // Anderson
       void increHeadTailCount ();
       unsigned getHeadTailCount ();
-
+      //virtual unsigned getNetworkReplica ()=0;
       // end Anderson
 
       TPZRouter* getRouterAt(const TPZPosition& position) const;

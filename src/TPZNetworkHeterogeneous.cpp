@@ -99,6 +99,7 @@ TPZNetworkHeterogeneous :: TPZNetworkHeterogeneous( const TPZComponentId& id,
 {
    unsigned diametro=getDiameter();
    initializeHistogram(diametro); // Anderson: histogram may be used to provide information about flit distance distribution.
+   m_replica = 1;
 }
 
 
@@ -115,6 +116,17 @@ TPZNetworkHeterogeneous :: ~TPZNetworkHeterogeneous()
 
 }
 
+void TPZNetworkHeterogeneous :: setNetworkReplica(unsigned replica)
+{
+   m_replica = replica;
+}
+
+unsigned TPZNetworkHeterogeneous :: getNetworkReplica(void)
+{
+   return m_replica;
+}
+
+
 
 void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
 {
@@ -125,8 +137,7 @@ void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
     TPZRouter* routerYp = getRouterAt(positionOf(_Yplus_, pos) );
     TPZRouter* routerYm = getRouterAt(positionOf(_Yminus_, pos) );
     TPZRouter* routerZp = getRouterAt(positionOf(_Zplus_, pos) );
-    TPZRouter* routerZm = getRouterAt(positionOf(_Zminus_, pos) );
-   
+    TPZRouter* routerZm = getRouterAt(positionOf(_Zminus_, pos) );   
    
     unsigned iXp = router->getInputWithType(_Xplus_);
     unsigned iXm = router->getInputWithType(_Xminus_);
@@ -146,7 +157,27 @@ void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
       Inter-router connections are formed here.
       The internal connections are formed in router.sgm file.
    */
+   // Based on the number of networks to establish inter-router connections.
+   for (int i=0; i<m_replica; i++)
+   {
+      if (iXp && oXp)
+         TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp+i*4),
+            routerXp->getInputInterfaz(iXp+i*4), getConnectionDelay() );        
+            
+      if (iXm && oXm)
+         TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXm+i*4),
+             routerXm->getInputInterfaz(iXm+i*4), getConnectionDelay() );
+
+      if (iYp && oYp)
+         TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYp+i*4),
+             routerYp->getInputInterfaz(iYp+i*4), getConnectionDelay() );     
+
+      if (iYm && oYm)
+         TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYm+i*4),
+             routerYm->getInputInterfaz(iYm+i*4), getConnectionDelay() ); 
+   }
    
+   /*
    if (iXp && oXp)
    {
       TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oXp),
@@ -178,7 +209,7 @@ void TPZNetworkHeterogeneous :: initializeConnectionsFor(const TPZPosition& pos)
       TPZConnection::connectInterfaces( this, router->getOutputInterfaz(oYm+4),
           routerYm->getInputInterfaz(iYm+4), getConnectionDelay() );
    }       
-  
+   */
 }
 
 
@@ -378,7 +409,9 @@ TPZNetworkHeterogeneous* TPZNetworkHeterogeneous :: newFrom( const TPZTag* tag,
 
    TPZString connectionDelay;
    TPZString operationMode;
+   TPZString networkReplica;
    unsigned delay=0;
+   unsigned replica=1;
 
    TPZNetworkHeterogeneous* net;
    if( tag->getAttributeValueWithName(TPZ_TAG_CHANNEL_MODE, operationMode) )
@@ -393,6 +426,10 @@ TPZNetworkHeterogeneous* TPZNetworkHeterogeneous :: newFrom( const TPZTag* tag,
    {
       net = new TPZNetworkHeterogeneous( idNetwork, routerId, x, y, z ); // Anderson: Torus network is created here.
    }
+   if(tag->getAttributeValueWithName(TPZ_TAG_REPLICA, networkReplica))
+   {
+      replica = networkReplica.asInteger();
+   }   
    else
    {
       TPZString err;
@@ -402,10 +439,11 @@ TPZNetworkHeterogeneous* TPZNetworkHeterogeneous :: newFrom( const TPZTag* tag,
 
    net->setConnectionDelay(delay);
    net->setChannelOperationMode(operationMode);
+   net->setNetworkReplica(replica);
 
    net->setOwner(owner);
-   net -> setSimulation(owner);
-   net -> initialize();  //A: routers will be created.
+   net->setSimulation(owner);
+   net->initialize();  //A: routers will be created.
 
    return net;
 }

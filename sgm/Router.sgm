@@ -1,5 +1,8 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 
+<!-- The following are MULTI-NOC routers -->
+
+<!-- Each router has 2 sub-routers. Topology: Torus -->
 <Router id="TORUS-BLESS-NOC2" inputs=8 outputs=8 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
    
    <Injector id="INJ1" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
@@ -62,6 +65,284 @@
    <Output id="7" type="Y+"   wrapper="ROUTER2.3">
    <Output id="8" type="Y-"   wrapper="ROUTER2.4">  
 </Router>
+
+<!-- Each router has 3 sub-routers. Topology: Torus -->
+<Router id="TORUS-BLESS-NOC3" inputs=12 outputs=12 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
+   
+   <Injector id="INJ1" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ2" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ3" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Consumer id="CONS1" typeCons="BLESS" >
+   <Consumer id="CONS2" typeCons="BLESS" >
+   <Consumer id="CONS3" typeCons="BLESS" >
+   
+   <SimpleRouter id="ROUTER1" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">        
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER2" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">          
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER3" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">          
+   </SimpleRouter>
+   
+   <Connection id="C01" source="INJ1" destiny="ROUTER1.6">
+   <Connection id="C02" source="INJ2" destiny="ROUTER2.6">
+   <Connection id="C03" source="INJ3" destiny="ROUTER3.6">
+   <Connection id="C04" source="ROUTER1.6" destiny="CONS1">  
+   <Connection id="C05" source="ROUTER2.6" destiny="CONS2">
+   <Connection id="C06" source="ROUTER3.6" destiny="CONS3">
+   <Connection id="C07" source="ROUTER1.5" destiny="ROUTER2.5">
+   <Connection id="C08" source="ROUTER2.5" destiny="ROUTER3.5">
+   <Connection id="C09" source="ROUTER3.5" destiny="ROUTER1.5">
+   
+   <Input id="1" type="X+"   wrapper="ROUTER1.1">
+   <Input id="2" type="X-"   wrapper="ROUTER1.2">
+   <Input id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Input id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Input id="5" type="X+"   wrapper="ROUTER2.1">
+   <Input id="6" type="X-"   wrapper="ROUTER2.2">
+   <Input id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Input id="8" type="Y-"   wrapper="ROUTER2.4">
+   <Input id="9" type="X+"   wrapper="ROUTER3.1">
+   <Input id="10" type="X-"   wrapper="ROUTER3.2">
+   <Input id="11" type="Y+"   wrapper="ROUTER3.3">
+   <Input id="12" type="Y-"   wrapper="ROUTER3.4">
+   
+   <Output id="1" type="X+"   wrapper="ROUTER1.1">
+   <Output id="2" type="X-"   wrapper="ROUTER1.2">
+   <Output id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Output id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Output id="5" type="X+"   wrapper="ROUTER2.1">
+   <Output id="6" type="X-"   wrapper="ROUTER2.2">
+   <Output id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Output id="8" type="Y-"   wrapper="ROUTER2.4">
+   <Output id="9" type="X+"   wrapper="ROUTER3.1">
+   <Output id="10" type="X-"   wrapper="ROUTER3.2">
+   <Output id="11" type="Y+"   wrapper="ROUTER3.3">
+   <Output id="12" type="Y-"   wrapper="ROUTER3.4">   
+</Router>
+
+<!-- Each router has 4 sub-routers. Topology: Torus -->
+<Router id="TORUS-BLESS-NOC4" inputs=16 outputs=16 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
+   
+   <Injector id="INJ1" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ2" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ3" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ4" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Consumer id="CONS1" typeCons="BLESS" >
+   <Consumer id="CONS2" typeCons="BLESS" >
+   <Consumer id="CONS3" typeCons="BLESS" >
+   <Consumer id="CONS4" typeCons="BLESS" >
+   
+   <SimpleRouter id="ROUTER1" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">        
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER2" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">          
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER3" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">          
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER4" inputs="6" outputs="6" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Bypass">
+      <Input  id=6  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Bypass">
+      <Output id=6  type="Node">          
+   </SimpleRouter>
+   
+   <Connection id="C01" source="INJ1" destiny="ROUTER1.6">
+   <Connection id="C02" source="INJ2" destiny="ROUTER2.6">
+   <Connection id="C02" source="INJ3" destiny="ROUTER3.6">
+   <Connection id="C02" source="INJ4" destiny="ROUTER4.6">
+   <Connection id="C03" source="ROUTER1.6" destiny="CONS1">  
+   <Connection id="C04" source="ROUTER2.6" destiny="CONS2">
+   <Connection id="C04" source="ROUTER3.6" destiny="CONS3">
+   <Connection id="C04" source="ROUTER4.6" destiny="CONS4">
+   <Connection id="C05" source="ROUTER1.5" destiny="ROUTER2.5">
+   <Connection id="C06" source="ROUTER2.5" destiny="ROUTER3.5">
+   <Connection id="C06" source="ROUTER3.5" destiny="ROUTER4.5">
+   <Connection id="C06" source="ROUTER4.5" destiny="ROUTER1.5">
+   
+   <Input id="1" type="X+"   wrapper="ROUTER1.1">
+   <Input id="2" type="X-"   wrapper="ROUTER1.2">
+   <Input id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Input id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Input id="5" type="X+"   wrapper="ROUTER2.1">
+   <Input id="6" type="X-"   wrapper="ROUTER2.2">
+   <Input id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Input id="8" type="Y-"   wrapper="ROUTER2.4">
+   <Input id="9" type="X+"   wrapper="ROUTER3.1">
+   <Input id="10" type="X-"   wrapper="ROUTER3.2">
+   <Input id="11" type="Y+"   wrapper="ROUTER3.3">
+   <Input id="12" type="Y-"   wrapper="ROUTER3.4">
+   <Input id="13" type="X+"   wrapper="ROUTER4.1">
+   <Input id="14" type="X-"   wrapper="ROUTER4.2">
+   <Input id="15" type="Y+"   wrapper="ROUTER4.3">
+   <Input id="16" type="Y-"   wrapper="ROUTER4.4">   
+   
+   <Output id="1" type="X+"   wrapper="ROUTER1.1">
+   <Output id="2" type="X-"   wrapper="ROUTER1.2">
+   <Output id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Output id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Output id="5" type="X+"   wrapper="ROUTER2.1">
+   <Output id="6" type="X-"   wrapper="ROUTER2.2">
+   <Output id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Output id="8" type="Y-"   wrapper="ROUTER2.4">
+   <Output id="9" type="X+"   wrapper="ROUTER3.1">
+   <Output id="10" type="X-"   wrapper="ROUTER3.2">
+   <Output id="11" type="Y+"   wrapper="ROUTER3.3">
+   <Output id="12" type="Y-"   wrapper="ROUTER3.4">
+   <Output id="13" type="X+"   wrapper="ROUTER4.1">
+   <Output id="14" type="X-"   wrapper="ROUTER4.2">
+   <Output id="15" type="Y+"   wrapper="ROUTER4.3">
+   <Output id="16" type="Y-"   wrapper="ROUTER4.4">   
+</Router>
+
+
+
+
+
+
+
+<Router id="TORUS-BLESS-NOC2-NOBYPASS" inputs=8 outputs=8 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
+   
+   <Injector id="INJ1" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Injector id="INJ2" numHeaders=1 typeInj="CT-UC" numMessTypes=4>
+   <Consumer id="CONS1" typeCons="BLESS" >
+   <Consumer id="CONS2" typeCons="BLESS" >
+   
+   <SimpleRouter id="ROUTER1" inputs="5" outputs="5" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Node">        
+   </SimpleRouter>
+
+   <SimpleRouter id="ROUTER2" inputs="5" outputs="5" headerDelay=0 dataDelay=0 vnets=1>
+      <Input  id=1  type="X+">
+      <Input  id=2  type="X-">
+      <Input  id=3  type="Y+">
+      <Input  id=4  type="Y-">
+      <Input  id=5  type="Node">   
+      <Output id=1  type="X+">
+      <Output id=2  type="X-">
+      <Output id=3  type="Y+">
+      <Output id=4  type="Y-">
+      <Output id=5  type="Node">        
+   </SimpleRouter>
+   
+   <Connection id="C01" source="INJ1" destiny="ROUTER1.5">
+   <Connection id="C02" source="INJ2" destiny="ROUTER2.5">
+   <Connection id="C03" source="ROUTER1.5" destiny="CONS1">  
+   <Connection id="C04" source="ROUTER2.5" destiny="CONS2">
+   
+   <Input id="1" type="X+"   wrapper="ROUTER1.1">
+   <Input id="2" type="X-"   wrapper="ROUTER1.2">
+   <Input id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Input id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Input id="5" type="X+"   wrapper="ROUTER2.1">
+   <Input id="6" type="X-"   wrapper="ROUTER2.2">
+   <Input id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Input id="8" type="Y-"   wrapper="ROUTER2.4">
+   
+   <Output id="1" type="X+"   wrapper="ROUTER1.1">
+   <Output id="2" type="X-"   wrapper="ROUTER1.2">
+   <Output id="3" type="Y+"   wrapper="ROUTER1.3">
+   <Output id="4" type="Y-"   wrapper="ROUTER1.4">
+   <Output id="5" type="X+"   wrapper="ROUTER2.1">
+   <Output id="6" type="X-"   wrapper="ROUTER2.2">
+   <Output id="7" type="Y+"   wrapper="ROUTER2.3">
+   <Output id="8" type="Y-"   wrapper="ROUTER2.4">  
+</Router>
+
+
+
 
 <Router id="TORUS-BLESS-8In8Out" inputs=8 outputs=8 bufferSize=1 bufferControl=NIL routingControl="TORUS-BLESS">
    

@@ -683,7 +683,8 @@ TPZString TPZSimulation :: writeSimulationStatus()
              TPZString("\n Buffers size            = ") + TPZString(globalData().routerBufferSize()) +
              TPZString("\n Messages length         = ") + TPZString(m_MessageLength) + " packet(s)" +
              TPZString("\n Packets length          = ") + TPZString(m_PacketLength) + " flits" +
-	     TPZString("\n************************ PERFORMANCE ***********************") +
+             //TPZString("\n Network replica         = ") + TPZString(m_Network->getNetworkReplica()) +
+             TPZString("\n************************ PERFORMANCE ***********************") +
              TPZString("\n Supply Thr. Norm        = ") + TPZString(cargaAplicadaNormalizada) + " flits/cycle/router " +
              TPZString("\n Accept Thr. Norm        = ") + TPZString(throughputNormalizado) + " f/c/r (m: "
                                                        + TPZString(minimoInjectadoNormalizado)+ ", M:" +

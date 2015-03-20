@@ -90,7 +90,9 @@
                                       int&  deltaY,
                                       int&  deltaZ,
                                       Boolean ordered=false);
-     
+      void setNetworkReplica(unsigned replica);
+      unsigned getNetworkReplica(void);
+      
       virtual void generateDORMasks(TPZRouter* router);
       
       virtual unsigned long long setMulticastMask(const TPZPosition& current,
@@ -100,6 +102,7 @@
       DEFINE_RTTI(TPZNetworkHeterogeneous);
    protected:                                      
       virtual void initializeConnectionsFor(const TPZPosition& pos);    
+      unsigned m_replica;
       
    private:
       static TPZNetworkHeterogeneous* newFrom(const TPZTag* tag, TPZComponent* owner);
