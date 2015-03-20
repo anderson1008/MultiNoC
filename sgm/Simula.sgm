@@ -30,6 +30,22 @@
    <UnifyNetworks      id=1>
 </Simulation>
 
+<Simulation id="T44-BLESS-MULT-NOC2">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=2000000000000>
+   <StopInjectionAfterMsg id=10000>
+   <TrafficPattern     id="MODAL" type=EMPTY numMessTypes=4>
+   <Seed               id=113>
+   <Load               id=0.4>
+   <MessageLength      id=1>
+   <PacketLength       id=10>
+   <LinkWidth          id=8>
+   <FlitSize           id=5>
+   <NetworkClockRatio  id=1>
+   <UnifyNetworks      id=1>
+</Simulation>
+
+
 <Simulation id="T44-LIGERO">
    <Network            id="T44_LIGERO">
    <SimulationCycles   id=20000000000000000>

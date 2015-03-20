@@ -1,6 +1,7 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 <!--Simple Routers-->
 <HeterogeneousNetwork id="T44_BLESS_MULT_NOC" sizeX=4  sizeY=4  router="TORUS-BLESS-8In8Out" delay=0>
+<HeterogeneousNetwork id="T44_BLESS_MULT_NOC2" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC2" delay=0>
 
 <TorusNetwork id="T44_LIGERO" sizeX=4  sizeY=4  router="LIGERO" delay=0>
 <TorusNetwork id="T88_LIGERO" sizeX=8  sizeY=8  router="LIGERO" delay=0>

@@ -133,7 +133,7 @@ void TPZSimpleRouterFlowBless :: initialize()
    setCleanInterfaces(true);
 }
 
-unsigned NUM_LOCAL_PORT = 2;
+unsigned NUM_LOCAL_PORT = 1;
 
 //*************************************************************************
 //:
@@ -221,7 +221,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
    {
       // remove flit with small index first.
-      if( (m_priorityQueue.numberOfElements() < (m_ports-2)) && (m_injectionQueue.numberOfElements() !=0) )
+      if( (m_priorityQueue.numberOfElements() < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
       {
         TPZMessage* msg;
         m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
@@ -298,7 +298,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       */
       if (deflected==true)
       {
-         for ( outPort = 1; outPort <= m_ports-2; outPort++)
+         for ( outPort = 1; outPort <= m_ports-NUM_LOCAL_PORT; outPort++)
          {
             if (m_connEstablished[outPort]==false)
             {
