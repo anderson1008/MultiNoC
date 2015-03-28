@@ -130,10 +130,13 @@
    protected:
       unsigned *m_connections;
       TPZMessage** m_sync;
+      TPZMessage* m_bypassFlit;
+      TPZMessage** m_effectMsg;
       TPZArbitrationQueue m_priorityQueue;
       TPZInjectionQueue m_injectionQueue;
       Boolean* m_connEstablished;
       unsigned m_ports;
+      Boolean ** m_productiveVector;
       
             
 };

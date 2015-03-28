@@ -121,6 +121,8 @@ void TPZSimpleRouterFlowBless :: initialize()
    m_ports=((TPZSimpleRouter&)getComponent()).numberOfInputs();
    m_connections=new unsigned[m_ports+1];
    m_sync=new TPZMessage*[m_ports+1];
+   m_effectMsg=new TPZMessage*[m_ports+1];
+   m_productiveVector=new Boolean*[m_ports+1];
    m_connEstablished=new Boolean[m_ports+1];
    m_bypassFlit =  new TPZMessage;
    m_bypassFlit = 0;
@@ -130,6 +132,12 @@ void TPZSimpleRouterFlowBless :: initialize()
       m_connections[i] = 0;
       m_connEstablished[i] = false;
       m_sync[i]=0;
+      m_effectMsg[i] = 0;
+      m_productiveVector[i] = new Boolean [m_ports+1];
+      for (int j=0; j<m_ports+1; j++)
+      {
+         m_productiveVector[i][j] = false;
+      }
    }
 
    setCleanInterfaces(true);
@@ -184,19 +192,21 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    // Guarantee to allocate a productive port for the bypassed flit.
    if (m_bypassFlit)
    {
+      
       for ( outPort = 1; outPort <= m_ports; outPort++)
       {
-         if (getDeltaAbs(msg, outPort)==true)
+         if (getDeltaAbs(m_bypassFlit, outPort)==true)
 	     {
 	        m_connEstablished[outPort]=true;
-	        updateMessageInfo(msg, outPort);
+	        //updateMessageInfo(m_bypassFlit, outPort);
 	        ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
 	        if ( outPort!=m_ports) // A: not local-bound traffic
             {
                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
                getOwnerRouter().incrLinkUtilization();
 	        }
-	        outputInterfaz(outPort)->sendData(msg);
+	        outputInterfaz(outPort)->sendData(m_bypassFlit);
+           m_bypassFlit=0;
 	        #ifndef NO_TRAZA
                TPZString texto3 = getComponent().asString() + " Routed TIME = ";
                texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
@@ -229,7 +239,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
          if (getDeltaAbs(msg, outPort)==true && m_connEstablished[outPort]==false)
 	     {
 	        m_connEstablished[outPort]=true;
-	        updateMessageInfo(msg, outPort);
+	        //updateMessageInfo(msg, outPort);
 	        ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
 	        if ( outPort!=m_ports) // A: not local-bound traffic
             {
@@ -338,7 +348,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    {
       numFlit++;
       m_bypassFlit = m_sync[m_ports-NUM_LOCAL_PORT];
-      m_sync[m_ports-NUM_LOCAL_PORT];
+      m_sync[m_ports-NUM_LOCAL_PORT]=0;
    }
    // A: check the local injection and put the flit into injection queue.
    //    The injection queue should reside in NI.
