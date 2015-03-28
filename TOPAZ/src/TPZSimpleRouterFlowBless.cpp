@@ -188,35 +188,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    {
       m_connEstablished[outPort] = false;
    }
-
-   // Guarantee to allocate a productive port for the bypassed flit.
-   if (m_bypassFlit)
-   {
-      
-      for ( outPort = 1; outPort <= m_ports; outPort++)
-      {
-         if (getDeltaAbs(m_bypassFlit, outPort)==true)
-	     {
-	        m_connEstablished[outPort]=true;
-	        //updateMessageInfo(m_bypassFlit, outPort);
-	        ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
-	        if ( outPort!=m_ports) // A: not local-bound traffic
-            {
-               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
-               getOwnerRouter().incrLinkUtilization();
-	        }
-	        outputInterfaz(outPort)->sendData(m_bypassFlit);
-           m_bypassFlit=0;
-	        #ifndef NO_TRAZA
-               TPZString texto3 = getComponent().asString() + " Routed TIME = ";
-               texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
-               TPZWRITE2LOG(texto3);
-            #endif
-            break;
-	      }
-       }
-   }
-   
+  
    while ( m_priorityQueue.numberOfElements() != 0 )
    {
       TPZMessage* msg;  // A: construct a msg
@@ -234,6 +206,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       */
       
       // A: try to find an available output port.
+      
       for ( outPort = 1; outPort <= m_ports; outPort++)
       {
          if (getDeltaAbs(msg, outPort)==true && m_connEstablished[outPort]==false)
@@ -266,33 +239,13 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       */
       if (deflected==true)
       {  
-         /*
-         for ( outPort = 1; outPort <= m_ports-NUM_LOCAL_PORT; outPort++)
-         {
-            if (m_connEstablished[outPort]==false)
-            {
-                m_connEstablished[outPort]=true;
-                updateMessageInfo(msg, outPort);
-                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
-                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
-                outputInterfaz(outPort)->sendData(msg);
-                #ifndef NO_TRAZA
-                    TPZString texto4 = getComponent().asString() + " Deflected TIME = ";
-                    texto4 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
-                    TPZWRITE2LOG(texto4);
-                #endif
-                outObtained=true;
-                break;
-            }
-        }
         
-        */
         for ( outPort = m_ports-NUM_LOCAL_PORT; outPort >= 1; outPort--)
          {
             if (m_connEstablished[outPort]==false)
             {
                 m_connEstablished[outPort]=true;
-                updateMessageInfo(msg, outPort);
+                //updateMessageInfo(msg, outPort);
                 ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
                 ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
                 outputInterfaz(outPort)->sendData(msg);
@@ -323,15 +276,13 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    // PART1: move through all the sync (except injection, which has special treatment).
    // Put every message arrived into the only queue, ordered according to their priority (age)
    //**********************************************************************************************************
-   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT-NUM_BYPASS_PORT; inPort++)
+   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT; inPort++)
    {
       // If there is a message at sync,
       if(m_sync[inPort])
       {
-        // Anderson: may change the implementation.
-        // I don't need a priority queue.
-        // two stage arbitration may be implemented here.
         uTIME timeGen=m_sync[inPort]->generationTime(); // Anderson: get the time stamp information of each arrival flits
+        routeComputation(m_sync[inPort]);
         m_priorityQueue.enqueue(m_sync[inPort], timeGen); // Anderson: add into the priorityQueue.
 
 #ifndef NO_TRAZA
@@ -342,14 +293,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
          m_sync[inPort]=0;
       }
    }
-   unsigned numFlit;
-   numFlit = m_priorityQueue.numberOfElements();
-   if (m_sync[m_ports-NUM_LOCAL_PORT])
-   {
-      numFlit++;
-      m_bypassFlit = m_sync[m_ports-NUM_LOCAL_PORT];
-      m_sync[m_ports-NUM_LOCAL_PORT]=0;
-   }
+   
    // A: check the local injection and put the flit into injection queue.
    //    The injection queue should reside in NI.
    //    bypass may be added here.
@@ -379,11 +323,12 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
    {
       // remove flit with small index first.
-      if( (numFlit < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
+      if( (m_priorityQueue.numberOfElements() < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
       {
         TPZMessage* msg;
         m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
         uTIME timeGen=msg->generationTime();
+        routeComputation(msg);
         m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
         // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since msg is only retrieved from the head of a shared priorityQueue.
       }     
@@ -394,6 +339,24 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       
    return true;
  
+}
+
+Boolean TPZSimpleRouterFlowBless :: routeComputation(TPZMessage* msg)
+{
+   int deltaX;
+   int deltaY;
+   int deltaZ;
+
+   TPZPosition source= getOwnerRouter().getPosition();
+   TPZPosition destination=msg->destiny();
+   // A: This is the actual routing.
+   //    routingRecord () will be overloaded based on the type of network.
+   ((TPZNetwork*)getOwnerRouter().getOwner())->routingRecord(source,destination,deltaX,deltaY,deltaZ);
+   // A: Header manipulation.
+   msg->setDelta(deltaX,0);
+   msg->setDelta(deltaY,1);
+   msg->setDelta(deltaZ,2);
+   return true;
 }
 
 //*************************************************************************

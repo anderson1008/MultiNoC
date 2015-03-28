@@ -126,6 +126,7 @@
       void setCleanInterfaces(Boolean value)
       { m_CleanInterfaces = value; }
       Boolean m_CleanInterfaces;
+      Boolean routeComputation(TPZMessage* msg);
    
    protected:
       unsigned *m_connections;
