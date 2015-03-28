@@ -122,7 +122,9 @@ void TPZSimpleRouterFlowBless :: initialize()
    m_connections=new unsigned[m_ports+1];
    m_sync=new TPZMessage*[m_ports+1];
    m_connEstablished=new Boolean[m_ports+1];
-
+   m_bypassFlit =  new TPZMessage;
+   m_bypassFlit = 0;
+   
    for(int i=0; i<m_ports+1; i++)
    {
       m_connections[i] = 0;
@@ -134,6 +136,7 @@ void TPZSimpleRouterFlowBless :: initialize()
 }
 
 unsigned NUM_LOCAL_PORT = 1;
+unsigned NUM_BYPASS_PORT = 1;
 
 //*************************************************************************
 //:
@@ -164,78 +167,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    unsigned outPort;
    unsigned inPort;
    
- 
-   
    cleanOutputInterfaces();
-
-   //**********************************************************************************************************
-   // PART1: move through all the sync (except injection, which has special treatment).
-   // Put every message arrived into the only queue, ordered according to their priority (age)
-   //**********************************************************************************************************
-   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT; inPort++)
-   {
-      // If there is a message at sync,
-      if(m_sync[inPort])
-      {
-        // Anderson: may change the implementation.
-        // I don't need a priority queue.
-        // two stage arbitration may be implemented here.
-        uTIME timeGen=m_sync[inPort]->generationTime(); // Anderson: get the time stamp information of each arrival flits
-        m_priorityQueue.enqueue(m_sync[inPort], timeGen); // Anderson: add into the priorityQueue.
-
-#ifndef NO_TRAZA
-		TPZString texto = getComponent().asString() + " Message at Sync. TIME = ";
-		texto += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(inPort) + m_sync[inPort]->asString() ;
-		TPZWRITE2LOG(texto);
-#endif
-         m_sync[inPort]=0;
-      }
-   }
-
-   // A: check the local injection and put the flit into injection queue.
-   //    The injection queue should reside in NI.
-   //    bypass may be added here.
-   // Those comming from injection only move forward if one input port is free
-   //********************************************************************************************************
-   
-   // queue the flit with large index first
-   // so if there are two flits in the injectionQ, the head flit is from the port with small index
-   for (int i=0; i< NUM_LOCAL_PORT; i++)
-   {
-      if(m_sync[m_ports-i])
-      {
-         m_injectionQueue.enqueue(m_sync[m_ports-i]);
-         #ifndef NO_TRAZA
-         TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
-         texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(m_ports-i) + m_sync[m_ports-i]->asString() ;
-         TPZWRITE2LOG(texto2);
-         #endif
-         m_sync[m_ports-i]=0;
-      }  
-   }
-   
-   /*
-      allow injection if #_arrival_input < #_port - #_localPort; (make sure no deadlock
-   */
-   
-   for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
-   {
-      // remove flit with small index first.
-      if( (m_priorityQueue.numberOfElements() < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
-      {
-        TPZMessage* msg;
-        m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
-        uTIME timeGen=msg->generationTime();
-        m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
-        // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since msg is only retrieved from the head of a shared priorityQueue.
-      }     
-       
-      if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports-i)->sendStopRightNow();
-      else inputInterfaz(m_ports-i)->clearStopRightNow();
-   }
-      
-
- 
    
    //**********************************************************************************************************
    // PART2: Empty message queue
@@ -249,6 +181,32 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       m_connEstablished[outPort] = false;
    }
 
+   // Guarantee to allocate a productive port for the bypassed flit.
+   if (m_bypassFlit)
+   {
+      for ( outPort = 1; outPort <= m_ports; outPort++)
+      {
+         if (getDeltaAbs(msg, outPort)==true)
+	     {
+	        m_connEstablished[outPort]=true;
+	        updateMessageInfo(msg, outPort);
+	        ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
+	        if ( outPort!=m_ports) // A: not local-bound traffic
+            {
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
+               getOwnerRouter().incrLinkUtilization();
+	        }
+	        outputInterfaz(outPort)->sendData(msg);
+	        #ifndef NO_TRAZA
+               TPZString texto3 = getComponent().asString() + " Routed TIME = ";
+               texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
+               TPZWRITE2LOG(texto3);
+            #endif
+            break;
+	      }
+       }
+   }
+   
    while ( m_priorityQueue.numberOfElements() != 0 )
    {
       TPZMessage* msg;  // A: construct a msg
@@ -351,8 +309,81 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    }
 
 
+   //**********************************************************************************************************
+   // PART1: move through all the sync (except injection, which has special treatment).
+   // Put every message arrived into the only queue, ordered according to their priority (age)
+   //**********************************************************************************************************
+   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT-NUM_BYPASS_PORT; inPort++)
+   {
+      // If there is a message at sync,
+      if(m_sync[inPort])
+      {
+        // Anderson: may change the implementation.
+        // I don't need a priority queue.
+        // two stage arbitration may be implemented here.
+        uTIME timeGen=m_sync[inPort]->generationTime(); // Anderson: get the time stamp information of each arrival flits
+        m_priorityQueue.enqueue(m_sync[inPort], timeGen); // Anderson: add into the priorityQueue.
 
+#ifndef NO_TRAZA
+		TPZString texto = getComponent().asString() + " Message at Sync. TIME = ";
+		texto += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(inPort) + m_sync[inPort]->asString() ;
+		TPZWRITE2LOG(texto);
+#endif
+         m_sync[inPort]=0;
+      }
+   }
+   unsigned numFlit;
+   numFlit = m_priorityQueue.numberOfElements();
+   if (m_sync[m_ports-NUM_LOCAL_PORT])
+   {
+      numFlit++;
+      m_bypassFlit = m_sync[m_ports-NUM_LOCAL_PORT];
+      m_sync[m_ports-NUM_LOCAL_PORT];
+   }
+   // A: check the local injection and put the flit into injection queue.
+   //    The injection queue should reside in NI.
+   //    bypass may be added here.
+   // Those comming from injection only move forward if one input port is free
+   //********************************************************************************************************
+   
+   // queue the flit with large index first
+   // so if there are two flits in the injectionQ, the head flit is from the port with small index
+   for (int i=0; i< NUM_LOCAL_PORT; i++)
+   {
+      if(m_sync[m_ports-i])
+      {
+         m_injectionQueue.enqueue(m_sync[m_ports-i]);
+         #ifndef NO_TRAZA
+         TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
+         texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(m_ports-i) + m_sync[m_ports-i]->asString() ;
+         TPZWRITE2LOG(texto2);
+         #endif
+         m_sync[m_ports-i]=0;
+      }  
+   }
+   
+   /*
+      allow injection if #_arrival_input < #_port - #_localPort; (make sure no deadlock
+   */
+   
+   for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
+   {
+      // remove flit with small index first.
+      if( (numFlit < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
+      {
+        TPZMessage* msg;
+        m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
+        uTIME timeGen=msg->generationTime();
+        m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
+        // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since msg is only retrieved from the head of a shared priorityQueue.
+      }     
+       
+      if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports-i)->sendStopRightNow();
+      else inputInterfaz(m_ports-i)->clearStopRightNow();
+   }
+      
    return true;
+ 
 }
 
 //*************************************************************************

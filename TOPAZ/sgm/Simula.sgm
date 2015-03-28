@@ -8,7 +8,7 @@
    <Seed               id=113>
    <Load               id=0.4>
    <MessageLength      id=1>
-   <PacketLength       id=1>
+   <PacketLength       id=2>
    <LinkWidth          id=16>
    <FlitSize           id=5>
    <NetworkClockRatio  id=1>
@@ -23,7 +23,7 @@
    <Seed               id=113>
    <Load               id=0.4>
    <MessageLength      id=1>
-   <PacketLength       id=2>
+   <PacketLength       id=4>
    <LinkWidth          id=8>
    <FlitSize           id=5>
    <NetworkClockRatio  id=1>
@@ -39,7 +39,7 @@
    <Seed               id=113>
    <Load               id=0.4>
    <MessageLength      id=1>
-   <PacketLength       id=3>
+   <PacketLength       id=6>
    <LinkWidth          id=8>
    <FlitSize           id=5>
    <NetworkClockRatio  id=1>
@@ -54,7 +54,7 @@
    <Seed               id=113>
    <Load               id=0.4>
    <MessageLength      id=1>
-   <PacketLength       id=4>
+   <PacketLength       id=8>
    <LinkWidth          id=8>
    <FlitSize           id=5>
    <NetworkClockRatio  id=1>
