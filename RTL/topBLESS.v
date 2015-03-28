@@ -65,8 +65,28 @@ routeComp routeCompNorth (r_dinN[`WIDTH_INTERNAL-1], r_dinN[`POS_X_DST], r_dinN[
 routeComp routeCompLocal (r_dinLocal[`WIDTH_INTERNAL-1], r_dinLocal[`POS_X_DST], r_dinLocal[`POS_Y_DST], prodVector[4]);
 routeComp routeCompBypass (r_dinBypass[`WIDTH_INTERNAL-1], r_dinBypass[`POS_X_DST], r_dinBypass[`POS_Y_DST], prodVector[5]);
 
-reg [`WIDTH_INTERNAL_PV-1:0] pipeline_reg1  [0:`NUM_PORT-1];
+wire [`WIDTH_INTERNAL_PV-1:0] PNin  [0:`NUM_PORT-3];
+wire [`WIDTH_INTERNAL_PV-1:0] LocalWithPV, BypassWithPV;
+assign PNin[0] = {prodVector[0],r_dinW};
+assign PNin[1] = {prodVector[1],r_dinE};
+assign PNin[2] = {prodVector[2],r_dinS};
+assign PNin[3] = {prodVector[3],r_dinN};
+assign LocalWithPV = {prodVector[4],r_dinLocal};      
+assign BypassWithPV = {prodVector[5],r_dinBypass}; 
 
+wire [`WIDTH_INTERNAL_PV-1:0] PNout0, PNout1, PNout2, PNout3;
+permutationNetwork permutationNetwork (
+PNin[0], 
+PNin[1], 
+PNin[2], 
+PNin[3], 
+PNout0, 
+PNout1, 
+PNout2, 
+PNout3
+);
+
+reg [`WIDTH_INTERNAL_PV-1:0] pipeline_reg1  [0:`NUM_PORT-1];
 always @ (posedge clk or negedge reset) begin
    if (~reset) begin
       pipeline_reg1[0] <= 0;
@@ -77,32 +97,18 @@ always @ (posedge clk or negedge reset) begin
       pipeline_reg1[5] <= 0;
    end
    else begin
-      pipeline_reg1[0] <= {prodVector[0],r_dinW};
-      pipeline_reg1[1] <= {prodVector[1],r_dinE};
-      pipeline_reg1[2] <= {prodVector[2],r_dinS};
-      pipeline_reg1[3] <= {prodVector[3],r_dinN};
-      pipeline_reg1[4] <= {prodVector[4],r_dinLocal};      
-      pipeline_reg1[5] <= {prodVector[5],r_dinBypass};      
+      pipeline_reg1[0] <= PNout0;
+      pipeline_reg1[1] <= PNout1;
+      pipeline_reg1[2] <= PNout2;
+      pipeline_reg1[3] <= PNout3;
+      pipeline_reg1[4] <= LocalWithPV;
+      pipeline_reg1[5] <= BypassWithPV;     
    end
 end
 
-
-wire [`WIDTH_INTERNAL_PV-1:0] PNout0, PNout1, PNout2, PNout3;
-permutationNetwork permutationNetwork (
-pipeline_reg1[0], 
-pipeline_reg1[1], 
-pipeline_reg1[2], 
-pipeline_reg1[3], 
-PNout0, 
-PNout1, 
-PNout2, 
-PNout3
-);
-
 wire [`NUM_PORT*`WIDTH_PV-1:0] reqVector;
 wire [`NUM_PORT*`NUM_PORT-1:0] allocVector;
-assign reqVector = {pipeline_reg1[4][`POS_PV],PNout3[`POS_PV],PNout2[`POS_PV],PNout1[`POS_PV],PNout0[`POS_PV],pipeline_reg1[5][`POS_PV]};
-
+assign reqVector = {pipeline_reg1[4][`POS_PV],pipeline_reg1[3][`POS_PV],pipeline_reg1[2][`POS_PV],pipeline_reg1[1][`POS_PV],pipeline_reg1[0][`POS_PV],pipeline_reg1[5][`POS_PV]};
 portAllocWrapper portAllocWrapper (reqVector, allocVector);
 
 // Strip off PV and valid fields.
