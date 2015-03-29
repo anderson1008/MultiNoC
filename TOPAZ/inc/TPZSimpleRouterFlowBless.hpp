@@ -85,12 +85,14 @@
    
    typedef TPZPriorityQueue<TPZMessage*>      TPZArbitrationQueue;
    typedef TPZQueue<TPZMessage*>              TPZInjectionQueue;
-
+   typedef TPZQueue<TPZMessage*>              TPZEgressQueue;
+   //typedef TPZQueue<Boolean*>                 TPZPVQueue;
 //*************************************************************************
 
    class TPZSimpleRouterFlowBless : public TPZFlow
    {
       typedef TPZFlow Inhereited;
+      
    
    public:
       TPZSimpleRouterFlowBless( TPZComponent& component);
@@ -132,7 +134,8 @@
       unsigned *m_connections;
       TPZMessage** m_sync;
       TPZMessage* m_bypassFlit;
-      TPZMessage** m_effectMsg;
+      TPZEgressQueue m_egreeQueue;
+      //TPZPVQueue m_PVQueue;
       TPZArbitrationQueue m_priorityQueue;
       TPZInjectionQueue m_injectionQueue;
       Boolean* m_connEstablished;
