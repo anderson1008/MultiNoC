@@ -85,7 +85,7 @@
    
    typedef TPZPriorityQueue<TPZMessage*>      TPZArbitrationQueue;
    typedef TPZQueue<TPZMessage*>              TPZInjectionQueue;
-   typedef TPZQueue<TPZMessage*>              TPZEgressQueue;
+   typedef TPZPriorityQueue<TPZMessage*>              TPZEgressQueue;
    //typedef TPZQueue<Boolean*>                 TPZPVQueue;
 //*************************************************************************
 

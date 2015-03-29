@@ -205,17 +205,14 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       m_egreeQueue.enqueue(msg);
       //Boolean * productiveVector =  new Boolean [m_ports+1];
       flitIndex++;
-      for (outPort=1; outPort<m_ports+1; outPort++)
-      {
-         m_productiveVector[flitIndex][outPort]= false;
-      }
-      
       for ( outPort = 1; outPort < m_ports+1; outPort++)
       {
          if (getDeltaAbs(msg, outPort)==true)
          {
             m_productiveVector[flitIndex][outPort] = true;
          }
+         else
+            m_productiveVector[flitIndex][outPort] = false;
       }
    }
    
@@ -230,15 +227,15 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       
       Boolean * preferedPV = new Boolean [m_ports+1];
       Boolean preferedPortExist = false;
-      /*
+      
       for (int i=1; i<m_ports+1; i++)
          preferedPV[i] = false;
-      */   
+       
       for (int i=1; i<m_ports+1; i++)
       {
-         for (int j=flitIndex+1; i<m_ports+1; i++)
+         for (int j=flitIndex+1; j<m_ports+1; j++)
             preferedPV[i] = m_productiveVector[j][i] | preferedPV[i];
-         preferedPV[i] = ~preferedPV[i] & m_productiveVector[flitIndex][i];  // the actual non-conflicted outport 
+         preferedPV[i] = ~preferedPV[i] & m_productiveVector[flitIndex][i]  & (~m_connEstablished[i]);  // the actual non-conflicted outport 
          preferedPortExist = preferedPortExist | preferedPV[i];
       }
       
@@ -246,7 +243,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       {
          for ( outPort = 1; outPort <= m_ports; outPort++)
          {
-            if (preferedPV[outPort] == true)
+            if (preferedPV[outPort] == true )
             {
                m_connEstablished[outPort]=true;
                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
@@ -263,8 +260,9 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
                #endif
                deflected=false;
                outObtained=true;
+               break;
             }
-            break;
+            
          }
       }
       else
