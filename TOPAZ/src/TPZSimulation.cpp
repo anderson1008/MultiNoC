@@ -663,59 +663,79 @@ TPZString TPZSimulation :: writeSimulationStatus()
    time_t localHour2 = time(0);
    TPZString buffer;
 
+   /*
+      For tabulate the result, use this simplified version.
+   */
+   buffer +=  
+   TPZString("\n") + TPZString(m_Clock) +
+   TPZString("\n") + TPZString(cargaAplicadaNormalizada) + 
+   TPZString("\n") + TPZString(throughputNormalizado) + 
+   TPZString("\n") + TPZString(cargaAplicadaFC) +
+   TPZString("\n") + TPZString(throughput)+                                    
+   TPZString("\n") + TPZString(distanciaMedia) +
+   TPZString("\n") + TPZString(m_Network->getMessagesTx()) +
+   TPZString("\n") + TPZString(m_Network->getMessagesRx()) +
+   TPZString("\n") + TPZString(m_Network->getMessagesToTx()) +
+   TPZString("\n") + TPZString(m_Network->getMessagesEscape()) +
+   TPZString("\n") + TPZString(latMediaMsgTotal) +
+   TPZString("\n") + TPZString(latMediaMsgNetwork) +
+   TPZString("\n") + TPZString(latMediaMsgBuffer) +
+   TPZString("\n") + TPZString(m_Network->getMaximLatency(TPZNetwork::Message)) +
+   TPZString("\n") + TPZString(m_LastMessage) + TPZString("\n");
    //****************************************************************************************************************************
    // VERBOSITY=0
    //****************************************************************************************************************************
+   /*
    buffer += TPZString("\n******************* NET CONFIGURATION *********************") +
-	     TPZString("\n Network        : ") + asString() +
-             TPZString("\n Started at     : " ) + ctime(&m_StartHour) +
-             TPZString(" Ended at       : " ) + ctime(&localHour2);
+   TPZString("\n Network        : ") + asString() +
+   TPZString("\n Started at     : " ) + ctime(&m_StartHour) +
+   TPZString(" Ended at       : " ) + ctime(&localHour2);
    buffer += TPZString("***********************************************************");
 
    buffer += TPZString("\n Simulation time         = ") +
-             convertSeconds(difftime(localHour2,m_StartHour))+ TPZString(" (")+TPZString(difftime(localHour2,m_StartHour)) + TPZString(" secs)")+
-             TPZString("\n");
+   convertSeconds(difftime(localHour2,m_StartHour))+ TPZString(" (")+TPZString(difftime(localHour2,m_StartHour)) + TPZString(" secs)")+
+   TPZString("\n");
    buffer += TPZString(" Memory Footprint        = ") + TPZString(process_memory_total()) + TPZString(" MBytes)")+TPZString("\n");
    buffer += TPZString(" Traffic Pattern         = ") + m_TrafficPattern->asString() +
-             TPZString("\n Seed                    = ") + TPZString(m_Seed) +
-             TPZString("\n Cycles simulated        = ") + TPZString(m_Clock) +
-             TPZString("\n Cycles deprecated       = ") + TPZString(m_resetStats) +
-             TPZString("\n Buffers size            = ") + TPZString(globalData().routerBufferSize()) +
-             TPZString("\n Messages length         = ") + TPZString(m_MessageLength) + " packet(s)" +
-             TPZString("\n Packets length          = ") + TPZString(m_PacketLength) + " flits" +
-             //TPZString("\n Network replica         = ") + TPZString(m_Network->getNetworkReplica()) +
-             TPZString("\n************************ PERFORMANCE ***********************") +
-             TPZString("\n Supply Thr. Norm        = ") + TPZString(cargaAplicadaNormalizada) + " flits/cycle/router " +
-             TPZString("\n Accept Thr. Norm        = ") + TPZString(throughputNormalizado) + " f/c/r (m: "
-                                                       + TPZString(minimoInjectadoNormalizado)+ ", M:" +
-                                                       + TPZString(maximoInjectadoNormalizado) +")"+
-             TPZString("\n Supply Thr.             = ") + TPZString(cargaAplicadaFC) + " f/c" +
-             TPZString("\n Throughput              = ") + TPZString(throughput) + " f/c (m: "
-                                                       + TPZString(minimoInjectado)+ ", M:" +
-                                                       + TPZString(maximoInjectado) +")"+
-             TPZString("\n Average Distance        = ") + TPZString(distanciaMedia) +
-             TPZString("\n Messages generated      = ") + TPZString(m_Network->getMessagesTx()) +
-             TPZString("\n Messages received       = ") + TPZString(m_Network->getMessagesRx()) +
-             TPZString("\n Messages to inject      = ") + TPZString(m_Network->getMessagesToTx()) +
-	     TPZString("\n Messages on Escape      = ") + TPZString(m_Network->getMessagesEscape()) +
-             TPZString("\n Total message latency   = ") + TPZString(latMediaMsgTotal) +
-             TPZString("\n Network message latency = ") + TPZString(latMediaMsgNetwork) +
-             TPZString("\n Buffer message latency  = ") + TPZString(latMediaMsgBuffer) +
-             TPZString("\n Maximum message latency = ") + TPZString(m_Network->getMaximLatency(TPZNetwork::Message)) +
-             TPZString("\n Last Message cycle      = ") + TPZString(m_LastMessage) + TPZString("\n");
-             buffer += TPZString("***********************************************************\n");
+   TPZString("\n Seed                    = ") + TPZString(m_Seed) +
+   TPZString("\n Cycles simulated        = ") + TPZString(m_Clock) +
+   TPZString("\n Cycles deprecated       = ") + TPZString(m_resetStats) +
+   TPZString("\n Buffers size            = ") + TPZString(globalData().routerBufferSize()) +
+   TPZString("\n Messages length         = ") + TPZString(m_MessageLength) + " packet(s)" +
+   TPZString("\n Packets length          = ") + TPZString(m_PacketLength) + " flits" +
+   //TPZString("\n Network replica         = ") + TPZString(m_Network->getNetworkReplica()) +
+   TPZString("\n************************ PERFORMANCE ***********************") +
+   TPZString("\n Supply Thr. Norm        = ") + TPZString(cargaAplicadaNormalizada) + " flits/cycle/router " +
+   TPZString("\n Accept Thr. Norm        = ") + TPZString(throughputNormalizado) + " f/c/r (m: "
+                                  + TPZString(minimoInjectadoNormalizado)+ ", M:" +
+                                  + TPZString(maximoInjectadoNormalizado) +")"+
+   TPZString("\n Supply Thr.             = ") + TPZString(cargaAplicadaFC) + " f/c" +
+   TPZString("\n Throughput              = ") + TPZString(throughput) + " f/c (m: "
+                                  + TPZString(minimoInjectado)+ ", M:" +
+                                  + TPZString(maximoInjectado) +")"+
+   TPZString("\n Average Distance        = ") + TPZString(distanciaMedia) +
+   TPZString("\n Messages generated      = ") + TPZString(m_Network->getMessagesTx()) +
+   TPZString("\n Messages received       = ") + TPZString(m_Network->getMessagesRx()) +
+   TPZString("\n Messages to inject      = ") + TPZString(m_Network->getMessagesToTx()) +
+   TPZString("\n Messages on Escape      = ") + TPZString(m_Network->getMessagesEscape()) +
+   TPZString("\n Total message latency   = ") + TPZString(latMediaMsgTotal) +
+   TPZString("\n Network message latency = ") + TPZString(latMediaMsgNetwork) +
+   TPZString("\n Buffer message latency  = ") + TPZString(latMediaMsgBuffer) +
+   TPZString("\n Maximum message latency = ") + TPZString(m_Network->getMaximLatency(TPZNetwork::Message)) +
+   TPZString("\n Last Message cycle      = ") + TPZString(m_LastMessage) + TPZString("\n");
+   buffer += TPZString("***********************************************************\n");
 
-             TPZString("\n\n******************** EVENT COUNTING **********************")+
-             TPZString("\n Buffer Writes           = ") + TPZString(m_Network->getEventCount( TPZNetwork::BufferWrite))+
-             TPZString("\n Buffer Reads            = ") + TPZString(m_Network->getEventCount( TPZNetwork::BufferRead))+
-             TPZString("\n VC Arbitrations         = ") + TPZString(m_Network->getEventCount( TPZNetwork::VCArbitration))+
-             TPZString("\n SW Arbitrations         = ") + TPZString(m_Network->getEventCount( TPZNetwork::SWArbitration))+
-             TPZString("\n SW Traversal            = ") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal))+
-	     TPZString("\n Router Bypass           = ") + TPZString(m_Network->getEventCount( TPZNetwork::RouterBypass))+
-             TPZString("\n Link Traversal          = ") + TPZString(m_Network->getEventCount( TPZNetwork::LinkTraversal))+
-	     TPZString("\n\n**********************************************************")+
-	     TPZString("\n");
-
+   TPZString("\n\n******************** EVENT COUNTING **********************")+
+   TPZString("\n Buffer Writes           = ") + TPZString(m_Network->getEventCount( TPZNetwork::BufferWrite))+
+   TPZString("\n Buffer Reads            = ") + TPZString(m_Network->getEventCount( TPZNetwork::BufferRead))+
+   TPZString("\n VC Arbitrations         = ") + TPZString(m_Network->getEventCount( TPZNetwork::VCArbitration))+
+   TPZString("\n SW Arbitrations         = ") + TPZString(m_Network->getEventCount( TPZNetwork::SWArbitration))+
+   TPZString("\n SW Traversal            = ") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal))+
+   TPZString("\n Router Bypass           = ") + TPZString(m_Network->getEventCount( TPZNetwork::RouterBypass))+
+   TPZString("\n Link Traversal          = ") + TPZString(m_Network->getEventCount( TPZNetwork::LinkTraversal))+
+   TPZString("\n\n**********************************************************")+
+   TPZString("\n");
+   */
 	     //****************************************************************************************************************************
              // VERBOSITY=1
              //****************************************************************************************************************************
