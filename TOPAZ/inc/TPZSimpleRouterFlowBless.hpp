@@ -129,7 +129,8 @@
       { m_CleanInterfaces = value; }
       Boolean m_CleanInterfaces;
       Boolean routeComputation(TPZMessage* msg);
-   
+      void sendFlit(TPZMessage* msg, unsigned index);
+      void computePV (TPZMessage* msg, unsigned index);
    protected:
       unsigned *m_connections;
       TPZMessage** m_sync;

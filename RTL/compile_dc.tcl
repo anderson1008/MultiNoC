@@ -10,7 +10,7 @@
 set my_verilog_files [list arbiterPN.v demux1to2.v demux1to6.v demuxWrapper1to2.v demuxWrapper1to6.v global.v highestBit.v mux2to1.v mux6to1.v muxWrapper2to1.v muxWrapper6to1.v outSelTrans.v permutationNetwork.v permuterBlock.v portAlloc.v portAllocLast.v portAllocTop.v portAllocWrapper.v routeComp.v topBLESS.v xbar6Ports.v xbarCtrl.v topMultiNoC.v]
 
 #/* Top-level Module                               */
-set my_toplevel topMultiNoC
+set my_toplevel demux1to6
 
 #/* The name of the clock pin. If no clock-pin     */
 #/* exists, pick anything                          */
@@ -18,6 +18,8 @@ set my_clock_pin clk
 
 #/* Target frequency in MHz for optimization       */
 set my_clk_freq_MHz 500
+
+set my_period 0.8 
 
 #/* Delay of input signals (Clock-to-Q, Package etc.)  */
 set my_input_delay_ns 0.1
@@ -35,7 +37,7 @@ set search_path [concat  $search_path $OSU_FREEPDK]
 
 set link_library [set target_library [concat  [list gscl45nm.db] [list dw_foundation.sldb]]]
 set target_library "gscl45nm.db"
-define_design_lib WORK -path ./WORK
+define_design_lib WORK -path /tmp/xxx1698/WORK
 set verilogout_show_unconnected_pins "true"
 set_ultra_optimization true
 set_ultra_optimization -force
@@ -49,7 +51,7 @@ current_design $my_toplevel
 link
 uniquify
 
-set my_period [expr 1000 / $my_clk_freq_MHz]
+#set my_period [expr 1000 / $my_clk_freq_MHz]
 
 set find_clock [ find port [list $my_clock_pin] ]
 if {  $find_clock != [list] } {
@@ -72,13 +74,13 @@ check_design
 report_constraint -all_violators
 
 set filename [format "%s%s"  $my_toplevel ".vh"]
-write -f verilog -output $filename
+write -f verilog -output /tmp/xxx1698/$filename
 
 set filename [format "%s%s"  $my_toplevel ".sdc"]
-write_sdc $filename
+write_sdc /tmp/xxx1698/$filename
 
 set filename [format "%s%s"  $my_toplevel ".db"]
-write -f db -hier -output $filename -xg_force_db
+write -f db -hier -output /tmp/xxx1698/$filename -xg_force_db
 
 redirect timing.rep { report_timing }
 redirect cell.rep { report_cell }

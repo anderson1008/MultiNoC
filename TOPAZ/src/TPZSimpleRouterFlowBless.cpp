@@ -114,6 +114,11 @@ TPZSimpleRouterFlowBless :: ~TPZSimpleRouterFlowBless()
 //:
 //*************************************************************************
 
+/*
+   Local injection and bypass can skip prioritization.
+   They only experience 1 cycle latency.
+*/
+
 void TPZSimpleRouterFlowBless :: initialize()
 {
    Inhereited :: initialize();
@@ -123,9 +128,7 @@ void TPZSimpleRouterFlowBless :: initialize()
    m_sync=new TPZMessage*[m_ports+1];
    m_productiveVector=new Boolean*[m_ports+1];
    m_connEstablished=new Boolean[m_ports+1];
-   //m_bypassFlit =  new TPZMessage;
-   //m_bypassFlit = 0;
-   
+
    for(int i=0; i<m_ports+1; i++)
    {
       m_connections[i] = 0;
@@ -134,17 +137,15 @@ void TPZSimpleRouterFlowBless :: initialize()
       m_productiveVector[i] = new Boolean [m_ports+1];
       
       for (int j=0; j<m_ports+1; j++)
-      {
          m_productiveVector[i][j] = false;
-      }
       
    }
 
    setCleanInterfaces(true);
 }
 
-unsigned NUM_LOCAL_PORT = 1;
-unsigned NUM_BYPASS_PORT = 1;
+unsigned NUM_LOCAL_PORT = 1; // number of injector 
+unsigned NUM_BYPASS_PORT = 1; // number of bypass port 
 
 //*************************************************************************
 //:
@@ -176,169 +177,111 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    unsigned outPort;
    unsigned inPort;
    
+     
+   //**********************************************************************************************************
+   // Pipeline Stage 2: Port Allocation & Switch Traversal
+   // the egree/priority queue must remain completely empty, every message must find an output port.
+   //**********************************************************************************************************
+   
    cleanOutputInterfaces();
    
-   //**********************************************************************************************************
-   // PART2: Empty message queue
-   // It must remain completely empty, every message must find an output port.
-   //**********************************************************************************************************
-   // A: Here, the connection is released after sending each flit.
-   // A: modify: each connection will be released at the unit of each packet.
-
-   for( outPort=1; outPort<=m_ports; outPort++)
+   //********************************************************************************************************
+   // Compute the PV for bypass flits.
+   //********************************************************************************************************
+   unsigned bypass=0; // number of bypass flit. Currently, at most 1.   
+   if (m_sync[m_ports-1])
    {
-      m_connEstablished[outPort] = false;
-   }
+      routeComputation(m_sync[m_ports-1]);
+      computePV(m_sync[m_ports-1],m_ports-1);
+      bypass=1;
+   }   
+   
+   //********************************************************************************************************
+   // check the local injection and put the flit into injection queue.
+   // Those comming from injection only move forward if one input port is free
+   //********************************************************************************************************
+   if(m_sync[m_ports])
+   {
+      m_injectionQueue.enqueue(m_sync[m_ports]);
+      #ifndef NO_TRAZA
+      TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
+      texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(m_ports) + m_sync[m_ports]->asString() ;
+      TPZWRITE2LOG(texto2);
+      #endif
+      m_sync[m_ports]=0;
+   }  
   
+   //*******************************************************************************************************
+   /* allow injection if #_arrival_input < #_port - #_localPort; (make sure no deadlock
+      Prioritization is relaxed here: the local flit may or may not be lowest in terms of priority, since the flit being throttled in the previous cycle may has higher priority at the current cycle. However, all local flits are treated as lower priority flit. */  
+   //********************************************************************************************************
+   TPZMessage* msgLocal;
+   if( (m_priorityQueue.numberOfElements() < (m_ports-1-bypass)) && (m_injectionQueue.numberOfElements() !=0) )
+   {
+     m_injectionQueue.dequeue(msgLocal);
+     uTIME timeGen=msgLocal->generationTime();
+     routeComputation(msgLocal);
+   }
+   else 
+      msgLocal=0;
+    
+   if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports)->sendStopRightNow();
+   else inputInterfaz(m_ports)->clearStopRightNow(); 
+   
+   //********************************************************************************************************
+   // Compute the PV for local flits.
+   //********************************************************************************************************   
+   if (msgLocal)        
+      computePV(msgLocal,m_ports);
+ 
+   //********************************************************************************************************
+   // Compute the PV of each non-local incoming flits (not including local and bypass flits.) 
+   //********************************************************************************************************   
    unsigned flitIndex=0;
    while ( m_priorityQueue.numberOfElements() != 0 )
    {
       TPZMessage* msg;  // A: construct a msg
       m_priorityQueue.dequeue(msg); // A: consume a msg in the priorityQueue
-     /*
-     if (msg->getIdentifier() == 3 && msg->flitNumber() == 5)
-      {
-         cout << "Time is " << getOwnerRouter().getCurrentTime() << endl;
-         cout << "We are at " << getComponent().asString() << endl;
-      }
-      */
-      m_egreeQueue.enqueue(msg);
-      //Boolean * productiveVector =  new Boolean [m_ports+1];
+      uTIME timeGen=msg->generationTime(); // Anderson: get the time stamp information of each 
+      m_egreeQueue.enqueue(msg,timeGen);     
       flitIndex++;
-      for ( outPort = 1; outPort < m_ports+1; outPort++)
-      {
-         if (getDeltaAbs(msg, outPort)==true)
-         {
-            m_productiveVector[flitIndex][outPort] = true;
-         }
-         else
-            m_productiveVector[flitIndex][outPort] = false;
-      }
+      computePV(msg,flitIndex);
    }
    
+   //******************************************************************************************************** 
+   // Port Allocation and Switch Traversal start here.
+   //********************************************************************************************************    
+   for( outPort=1; outPort<=m_ports; outPort++)
+      m_connEstablished[outPort] = false;  
+   
    flitIndex=0;
+   
+   // Highest Priority: Non-local flits
    while (m_egreeQueue.numberOfElements()!=0)
    {
-      Boolean outObtained=false;
-      Boolean deflected=true;   // A: why deflect the flit by default?
-      TPZMessage* msg;  // A: construct a msg
-      m_egreeQueue.dequeue(msg); // A: consume a msg in the priorityQueue
-      flitIndex++;
-      
-      Boolean * preferedPV = new Boolean [m_ports+1];
-      Boolean preferedPortExist = false;
-      
-      for (int i=1; i<m_ports+1; i++)
-         preferedPV[i] = false;
-       
-      for (int i=1; i<m_ports+1; i++)
-      {
-         for (int j=flitIndex+1; j<m_ports+1; j++)
-            preferedPV[i] = m_productiveVector[j][i] | preferedPV[i];
-         preferedPV[i] = ~preferedPV[i] & m_productiveVector[flitIndex][i]  & (~m_connEstablished[i]);  // the actual non-conflicted outport 
-         preferedPortExist = preferedPortExist | preferedPV[i];
-      }
-      
-      if (preferedPortExist)
-      {
-         for ( outPort = 1; outPort <= m_ports; outPort++)
-         {
-            if (preferedPV[outPort] == true )
-            {
-               m_connEstablished[outPort]=true;
-               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
-               if ( outPort!=m_ports) // A: not local-bound traffic
-               {
-                  ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
-                  getOwnerRouter().incrLinkUtilization();// by Anderson
-               }
-               outputInterfaz(outPort)->sendData(msg);
-               #ifndef NO_TRAZA
-                  TPZString texto3 = getComponent().asString() + " Routed TIME = ";
-                  texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
-                  TPZWRITE2LOG(texto3);
-               #endif
-               deflected=false;
-               outObtained=true;
-               break;
-            }
-            
-         }
-      }
-      else
-      {
-         for ( outPort = 1; outPort <= m_ports; outPort++)
-         {
-            if (m_productiveVector[flitIndex][outPort]==true && m_connEstablished[outPort]==false)
-           {
-              m_connEstablished[outPort]=true;
-              ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
-              if ( outPort!=m_ports) // A: not local-bound traffic
-               {
-                  ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
-                  getOwnerRouter().incrLinkUtilization();// by Anderson
-              }
-              outputInterfaz(outPort)->sendData(msg);
-              #ifndef NO_TRAZA
-                  TPZString texto3 = getComponent().asString() + " Routed TIME = ";
-                  texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
-                  TPZWRITE2LOG(texto3);
-               #endif
-              deflected=false;
-              outObtained=true;
-              break;
-            }
-          }
-         
-         /*
-            did not find an available output port. Deflection occurs.
-            In this case, deflect the flit to an unallocated port.
-            Notice that, deflect to consumers is not accepted.
-            So, be aware of the outPort range.
-         */
-         if (deflected==true)
-         {  
-           
-           for ( outPort = m_ports-NUM_LOCAL_PORT; outPort >= 1; outPort--)
-            {
-               if (m_connEstablished[outPort]==false)
-               {
-                   m_connEstablished[outPort]=true;
-                   //updateMessageInfo(msg, outPort);
-                   ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
-                   ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
-                   outputInterfaz(outPort)->sendData(msg);
-                   #ifndef NO_TRAZA
-                       TPZString texto4 = getComponent().asString() + " Deflected TIME = ";
-                       texto4 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
-                       TPZWRITE2LOG(texto4);
-                   #endif
-                   outObtained=true;
-                   break;
-               }
-           }
-         }
-      }
-      
-
- 
-      // A: This is just for precaution.
-      if (outObtained==false)
-      {
-         TPZString err;
-         err.sprintf("%s :One message did not find output port", (char*)getComponent().asString() );
-         EXIT_PROGRAM(err);
-      }
-      delete [] preferedPV;
+      TPZMessage* msg;  
+      m_egreeQueue.dequeue(msg); 
+      flitIndex++;  
+      sendFlit(msg, flitIndex);  
    }
 
-
-
+   // Medium Priority: bypassed flits
+   if (m_sync[m_ports-1])
+   {
+      sendFlit(m_sync[m_ports-1],m_ports-1);
+      m_sync[m_ports-1] = 0;
+   }
+   
+   // Lowest Priority: local injected flits
+   if (msgLocal)
+      sendFlit(msgLocal,m_ports);
+   
+   
    //**********************************************************************************************************
    // PART1: move through all the sync (except injection, which has special treatment).
    // Put every message arrived into the only queue, ordered according to their priority (age)
    //**********************************************************************************************************
-   for( inPort = 1; inPort <= m_ports-NUM_LOCAL_PORT; inPort++)
+   for( inPort = 1; inPort <= m_ports-2; inPort++)
    {
       // If there is a message at sync,
       if(m_sync[inPort])
@@ -356,53 +299,135 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       }
    }
    
-   // A: check the local injection and put the flit into injection queue.
-   //    The injection queue should reside in NI.
-   //    bypass may be added here.
-   // Those comming from injection only move forward if one input port is free
-   //********************************************************************************************************
-   
-   // queue the flit with large index first
-   // so if there are two flits in the injectionQ, the head flit is from the port with small index
-   for (int i=0; i< NUM_LOCAL_PORT; i++)
-   {
-      if(m_sync[m_ports-i])
-      {
-         m_injectionQueue.enqueue(m_sync[m_ports-i]);
-         #ifndef NO_TRAZA
-         TPZString texto2 = getComponent().asString() + " Message at Sync. TIME = ";
-         texto2 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "iPort=" + TPZString(m_ports-i) + m_sync[m_ports-i]->asString() ;
-         TPZWRITE2LOG(texto2);
-         #endif
-         m_sync[m_ports-i]=0;
-      }  
-   }
-   
-   /*
-      allow injection if #_arrival_input < #_port - #_localPort; (make sure no deadlock
-   */
-   
-   for (int i=NUM_LOCAL_PORT-1; i>=0; i--)
-   {
-      // remove flit with small index first.
-      if( (m_priorityQueue.numberOfElements() < (m_ports-NUM_LOCAL_PORT)) && (m_injectionQueue.numberOfElements() !=0) )
-      {
-        TPZMessage* msg;
-        m_injectionQueue.dequeue(msg); // Anderson: construct a outstanding msg.
-        uTIME timeGen=msg->generationTime();
-        routeComputation(msg);
-        m_priorityQueue.enqueue(msg, timeGen); // Anderson: put into the only priorityQueue.
-        // Anderson: although the newly injected flit will always has the lowest priority, it is also needed since msg is only retrieved from the head of a shared priorityQueue.
-      }     
-       
-      if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports-i)->sendStopRightNow();
-      else inputInterfaz(m_ports-i)->clearStopRightNow();
-   }
-      
    return true;
- 
 }
 
+
+void  TPZSimpleRouterFlowBless :: sendFlit(TPZMessage* msg, unsigned index)
+{
+   unsigned outPort;
+   Boolean outObtained=false;
+   Boolean deflected=true; 
+   
+   Boolean * preferedPV = new Boolean [m_ports+1];
+   Boolean preferedPortExist = false;
+   
+   for (unsigned i=1; i<m_ports+1; i++)
+      preferedPV[i] = false;
+    
+   for (unsigned i=1; i<m_ports+1; i++)
+   {
+      for (unsigned j=index+1; j<m_ports+1; j++)
+      {
+         preferedPV[i] = m_productiveVector[j][i] | preferedPV[i];
+      }
+       // the actual non-conflicted outport;
+      preferedPV[i] = ~preferedPV[i] & m_productiveVector[index][i]  & (m_connEstablished[i]==false);  
+      preferedPortExist = preferedPortExist | preferedPV[i];     
+   }
+   
+   if (preferedPortExist)
+   {  
+      // if non-conflicted port exists, go for it first.
+      for ( outPort = 1; outPort <= m_ports; outPort++)
+      {
+         if (preferedPV[outPort] == true )
+         {
+            m_connEstablished[outPort]=true;
+            ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
+            if ( outPort!=m_ports) 
+            {
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
+               getOwnerRouter().incrLinkUtilization();
+            }
+            outputInterfaz(outPort)->sendData(msg);
+            #ifndef NO_TRAZA
+               TPZString texto3 = getComponent().asString() + " Routed TIME = ";
+               texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
+               TPZWRITE2LOG(texto3);
+            #endif
+            deflected=false;
+            outObtained=true;
+            break;
+         }
+      }
+   }
+   else
+   {
+      // If non-conflicted port does not exists, use the conventional allocation scheme.
+      for ( outPort = 1; outPort <= m_ports; outPort++)
+      {
+         if (m_productiveVector[index][outPort]==true && m_connEstablished[outPort]==false)
+        {
+           m_connEstablished[outPort]=true;
+           ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
+           if ( outPort!=m_ports) 
+            {
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
+               getOwnerRouter().incrLinkUtilization();
+           }
+           outputInterfaz(outPort)->sendData(msg);
+           #ifndef NO_TRAZA
+               TPZString texto3 = getComponent().asString() + " Routed TIME = ";
+               texto3 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
+               TPZWRITE2LOG(texto3);
+            #endif
+           deflected=false;
+           outObtained=true;
+           break;
+         }
+       }
+      
+      /*
+         did not find an available output port. Deflection occurs.
+         In this case, deflect the flit to an unallocated port.
+         Notice that, deflect to consumers is not accepted.
+         So, be aware of the outPort range.
+      */
+      if (deflected==true)
+      {    
+        for ( outPort = m_ports-1; outPort >= 1; outPort--)
+         {
+            if (m_connEstablished[outPort]==false)
+            {
+               m_connEstablished[outPort]=true;
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal);
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal);
+               outputInterfaz(outPort)->sendData(msg);
+               #ifndef NO_TRAZA
+                 TPZString texto4 = getComponent().asString() + " Deflected TIME = ";
+                 texto4 += TPZString(getOwnerRouter().getCurrentTime()) + " # " + "oPort=" + TPZString(outPort) + msg->asString() ;
+                 TPZWRITE2LOG(texto4);
+               #endif
+               outObtained=true;
+               break;
+            }
+         }
+      }
+   }
+   
+   // This is just for precaution.
+   if (outObtained==false)
+   {
+      TPZString err;
+      err.sprintf("%s :One message did not find output port", (char*)getComponent().asString() );
+      EXIT_PROGRAM(err);
+   }
+   delete [] preferedPV;
+
+}
+
+void TPZSimpleRouterFlowBless ::computePV (TPZMessage* msg, unsigned index)
+{
+   unsigned outPort;
+   for ( outPort = 1; outPort < m_ports+1; outPort++)
+   {
+      if (getDeltaAbs(msg, outPort)==true)
+         m_productiveVector[index][outPort] = true;
+      else
+         m_productiveVector[index][outPort] = false;
+   }
+} 
 Boolean TPZSimpleRouterFlowBless :: routeComputation(TPZMessage* msg)
 {
    int deltaX;
