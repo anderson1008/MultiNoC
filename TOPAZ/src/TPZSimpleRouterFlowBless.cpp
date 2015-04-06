@@ -288,6 +288,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
    unsigned index;
    unsigned inPort, outPort;
    
+   /*
    // Optional
    // This part HAS to be replaced, which will increase the deflection rate
    for (index = 2; index <=4; index++)
@@ -295,6 +296,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
          for (outPort=1; outPort < m_ports+1; outPort++)
             m_productiveVector2[index][outPort] = !m_productiveVector2[inPort][outPort] && m_productiveVector2[index][outPort]; 
    // end optional
+   */
    
    Boolean * PPVExist = new Boolean [m_ports-1];
    
@@ -375,19 +377,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
       else if ((PPVExist[2]&PPVExist[3])==true)
          m_productiveVector2[4][5] = true; //bypass when flit2 is routed to productive port.
    }
-   /*
-   // For verification
-   for (inPort=1; inPort <=4; inPort++)
-   {
-      if (PPVExist[inPort] == false)
-      {
-         TPZString err;
-         err.sprintf("Error: TPZSimpleRouterFlowBless :: checkAllocation() \n");
-         err.sprintf("flit ", inPort, "cannot find a productive port." );
-         EXIT_PROGRAM(err);
-      }
-   }
-   */
+
    delete [] PPVExist;
    delete [] availablePV;
 }
@@ -405,8 +395,7 @@ void TPZSimpleRouterFlowBless :: ejectLocal()
          //only one flit can be removed.
          outputInterfaz(6)->sendData(m_pipelineReg1[index]);
          m_pipelineReg1[index] = 0;
-         m_productiveVector2[index][6]==false; // although local destined flit only has 1 productive port, it is always \
-          better to reset all 6 bits later.
+         m_productiveVector2[index][6]==false; // although local destined flit only has 1 productive port, it is always better to reset all 6 bits later.
          break;
       }
    }
@@ -415,13 +404,11 @@ void TPZSimpleRouterFlowBless :: ejectLocal()
 
 void TPZSimpleRouterFlowBless :: injectBypass()
 {
-   //m_bypass=0; // not useful
    if (m_sync[m_ports-1])
    {
       m_pipelineReg1[m_ports-1] = m_sync[m_ports-1];
       routeComputation(m_pipelineReg1[m_ports-1]);
       computePV2(m_pipelineReg1[m_ports-1],m_ports-1);
-      //m_bypass=1;
       m_sync[m_ports-1]=0;
    }
 }
@@ -435,19 +422,6 @@ Boolean TPZSimpleRouterFlowBless :: injectLocal()
    //*****************************************************************************************************s])
    if(m_sync[m_ports])
    {
-
-      unsigned stopPktId, stopFlitId;
-      char * stopRouter;
-      stopPktId = 34;
-      stopFlitId = 1;
-      stopRouter = "ROUTER1(3,2,0)";
-      Boolean stop;
-
-      if (stopPktId==m_sync[m_ports]->getIdentifier() && stopFlitId == m_sync[m_ports]->flitNumber() && stopRouter==getComponent().asString())
-      {
-         stop=true;
-      }
-
       m_injectionQueue.enqueue(m_sync[m_ports]);
       m_sync[m_ports]=0;
    }
@@ -491,7 +465,8 @@ void  TPZSimpleRouterFlowBless :: sendFlit()
             }
          }
       }
-         // This is just for precaution.
+      
+      // This is just for precaution.
       if (outObtained==false)
       {
          TPZString err;
@@ -571,8 +546,8 @@ void TPZSimpleRouterFlowBless :: permutationNetwork()
    // stage 3
    swapEnable[0] = swapCtrl (m_sync[1], m_sync[2], m_productiveVector1[1], m_productiveVector1[2], 0);
    swapEnable[1] = swapCtrl (m_sync[3], m_sync[4], m_productiveVector1[3], m_productiveVector1[4], 0);
-   resolveConflict (m_productiveVector1[1], m_productiveVector1[2], m_previousPV[1], m_previousPV[2], swapEnable[0], 0, 3);
-   resolveConflict (m_productiveVector1[3], m_productiveVector1[4], m_previousPV[3], m_previousPV[4], swapEnable[1], 0, 3);
+   resolveConflict (m_productiveVector1[1], m_productiveVector1[2], m_previousPV[1], m_previousPV[2], swapEnable[0], 0, 2); // the stage field function only for the bottom PN module of the 3rd stage. here, stage=2 is dummy.
+   resolveConflict (m_productiveVector1[3], m_productiveVector1[4], m_previousPV[3], m_previousPV[4], swapEnable[1], 0, 3); // the stage field function only for the bottom PN module of the 3rd stage.
       // swap: data, PV, and previousPV; PV and previousPV can be directly set in RTL level to reduce cost.
    swapMsg(m_sync[1], m_sync[2], swapEnable[0]);
    swapPV(m_productiveVector1[1], m_productiveVector1[2], swapEnable[0]);
@@ -639,31 +614,31 @@ void  TPZSimpleRouterFlowBless :: resolveConflict (Boolean * &PV0, Boolean * &PV
       if ((swapEnable == false && mode == 0) || (swapEnable == true && mode == 1)) //flit0 has higher priority
       {
          // update PV
-         PV0[i] = PPV0Exist ? PPV0[i] : PV0[i];
-         //PV0[i] = PPV0Exist ? (PPV0[i]& !previousPV1[i]) : (PV0[i]& !previousPV1[i]);
-         //if (stage==2)
+         // For wining flit of stage 1&2, choose PPV if exist. for the bottom permuter block at the stage3, must mask out the previousPV as well (since all 2 flits above have higher priority).
+         if (stage != 3)
+            PV0[i] = PPV0Exist ? PPV0[i] : PV0[i];
+         else // = 3
+            PV0[i] = PPV0Exist ? (PPV0[i]& !previousPV1[i]) : (PV0[i]& !previousPV1[i]);
+         
             PV1[i] = PPV0Exist ? (!PPV0[i] & !previousPV0[i] & PV1[i]) : (!PV0[i] & !previousPV0[i] & PV1[i]);
-         //else
-         //   PV1[i] = PPV0Exist ? (!PPV0[i] & PV1[i]) : (!PV0[i] & PV1[i]);
-
+        
          // Update previousPV
          previousPV0[i] = false;
          previousPV1[i] = PV0[i];
       }
       else if ((swapEnable == false && mode == 1) || (swapEnable == true && mode == 0))
       {
-         PV1[i] = PPV1Exist ? PPV1[i] : PV1[i];
-         //PV1[i] = PPV1Exist ? (PPV1[i] & !previousPV0[i]) : (PV1[i] & !previousPV0[i]);
-         //if (stage==2)
+         if (stage != 3)
+            PV1[i] = PPV1Exist ? PPV1[i] : PV1[i];
+         else
+            PV1[i] = PPV1Exist ? (PPV1[i] & !previousPV0[i]) : (PV1[i] & !previousPV0[i]);
+         
             PV0[i] = PPV1Exist ? (!PPV1[i] & !previousPV1[i] & PV0[i]) : (!PV1[i] & !previousPV1[i] & PV0[i]);
-         //else
-         //   PV0[i] = PPV1Exist ? (!PPV1[i] & PV0[i]) : (!PV1[i] & PV0[i]);
+        
          previousPV1[i] = false;
          previousPV0[i] = PV1[i];
       }
    }
-
-
 
    delete [] conflictFreePV;
    delete [] PPV0;
