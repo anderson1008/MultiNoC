@@ -1,3 +1,8 @@
+# CodeBlock file
+*.cbp
+*.cscope_file_list
+*.layout
+
 # Compiled Object files
 *.slo
 *.lo
