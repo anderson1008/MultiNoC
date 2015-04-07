@@ -85,8 +85,6 @@
 
    typedef TPZPriorityQueue<TPZMessage*>      TPZArbitrationQueue;
    typedef TPZQueue<TPZMessage*>              TPZInjectionQueue;
-   typedef TPZPriorityQueue<TPZMessage*>              TPZEgressQueue;
-   //typedef TPZQueue<Boolean*>                 TPZPVQueue;
 //*************************************************************************
 
    class TPZSimpleRouterFlowBless : public TPZFlow
@@ -141,7 +139,7 @@
       void swapMsg (TPZMessage* & msg0, TPZMessage* & msg1, Boolean swapEnable);
       void swapPV (Boolean* & PV0, Boolean* & PV1, Boolean swapEnable);
       Boolean swapCtrl (TPZMessage * msg0, TPZMessage * msg1, Boolean * PV0, Boolean * PV1, unsigned mode);
-      void resolveConflict (Boolean * &PV0, Boolean * &PV1, Boolean * &previousPV0, Boolean * &previousPV1, Boolean swapEnable, unsigned mode, unsigned stage);
+      void resolveConflict (Boolean * &PV0, Boolean * &PV1, Boolean * &previousPV0, Boolean * &previousPV1, Boolean swapEnable, unsigned mode);
       void computePV1 (TPZMessage* msg, unsigned index);
       void computePV2 (TPZMessage* msg, unsigned index);
       Boolean routeComputation(TPZMessage* msg);
@@ -150,20 +148,13 @@
       void debugStop(unsigned pktId, unsigned flitId, TPZString router);
       
    protected:
-      //unsigned *m_connections;
       TPZMessage** m_sync;
       TPZMessage** m_pipelineReg1;
-      //TPZEgressQueue m_egreeQueue;
-      //TPZPVQueue m_PVQueue;
-      //TPZArbitrationQueue m_priorityQueue;
       TPZInjectionQueue m_injectionQueue;
-      //Boolean* m_connEstablished;
       unsigned m_ports;
       Boolean ** m_productiveVector1;
       Boolean ** m_productiveVector2;
       Boolean ** m_previousPV;
-      //unsigned m_bypass;
-
 };
 
 //*************************************************************************
