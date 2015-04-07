@@ -183,13 +183,13 @@ void  TPZSimpleRouterFlowBless :: debugStop(unsigned pktId, unsigned flitId, TPZ
 {
    unsigned stopPktId, stopFlitId;
    char * stopRouter;
-   stopPktId = 1646;
-   stopFlitId = 3;
+   stopPktId = 3040;
+   stopFlitId = 1;
    Boolean stop;
 
    if (stopPktId==pktId && stopFlitId == flitId)
    {
-      if (router == "ROUTER2(1,1,0)")
+      if (router == "ROUTER2(1,2,0)")
          stop=true;
    }
 }
@@ -454,6 +454,8 @@ void  TPZSimpleRouterFlowBless :: sendFlit()
       outObtained = true;
       if (m_pipelineReg1[index])
       {
+         debugStop(m_pipelineReg1[index]->getIdentifier(),m_pipelineReg1[index]->flitNumber(),getComponent().asString());
+         
          outObtained = false;
          for ( outPort = 1; outPort <= m_ports-1; outPort++) // outPort 1-5; local has been removed.
          {
@@ -664,10 +666,13 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
       hasPV0 = hasPV0 | PV0[index];
       hasPV1 = hasPV1 | PV1[index];
    }
-
+   
+   
+   //   Strictly honor oldest first
+   
    if ((msg0 == 0 && msg1 == 0) )
       return false;
-   else if ((hasPV0 == false && hasPV1 == true) || (msg0 == 0 && msg1 != 0))
+   else if (msg0 == 0 && msg1 != 0)
    {
       // msg1 has higher priority
       if (mode == 0)
@@ -675,14 +680,14 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
       else if (mode == 1)
          return false;
    }
-   else if ((hasPV0 == true && hasPV1 == false) || (msg0 != 0 && msg1 == 0))
+   else if (msg0 != 0 && msg1 == 0)
    {
       if (mode == 0)
          return false;
       else if (mode == 1)
          return true;
    }
-   else if ((hasPV0 == true && hasPV1 == true) || (hasPV0 == false && hasPV1 == false))
+   else 
    {
       unsigned timeGen0, timeGen1;
       timeGen0 = msg0->generationTime();
@@ -695,6 +700,23 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
          else if (mode == 1)
             return false;
       }
+      else if (timeGen0 == timeGen1)
+      {  
+         if (hasPV0)
+         {
+            if (mode == 0)
+               return false;
+            else if (mode == 1)
+               return true;
+         }      
+         else
+         {
+            if (mode == 0)
+               return true;
+            else if (mode == 1)
+               return false;
+         }       
+      }
       else
       {
          if (mode == 0)
@@ -702,12 +724,6 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
          else if (mode == 1)
             return true;
       }
-   }
-   else
-   {
-      TPZString err;
-      err.sprintf("Error: TPZSimpleRouterFlowBless :: swapCtrl");
-      EXIT_PROGRAM(err);
    }
 }
 
