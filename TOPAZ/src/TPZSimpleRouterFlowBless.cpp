@@ -274,28 +274,28 @@ void TPZSimpleRouterFlowBless :: permutationNetwork()
    // Stage 1
    swapEnable[0] = swapCtrl (m_sync[1], m_sync[2], m_productiveVector1[1], m_productiveVector1[2], 0);
    swapEnable[1] = swapCtrl (m_sync[3], m_sync[4], m_productiveVector1[3], m_productiveVector1[4], 1);
-   resolveConflict (m_productiveVector1[1], m_productiveVector1[2], m_previousPV[1], m_previousPV[2], swapEnable[0], 0);
-   resolveConflict (m_productiveVector1[3], m_productiveVector1[4], m_previousPV[3], m_previousPV[4], swapEnable[1], 0);
+   //resolveConflict (m_productiveVector1[1], m_productiveVector1[2], m_previousPV[1], m_previousPV[2], swapEnable[0], 0);
+   //resolveConflict (m_productiveVector1[3], m_productiveVector1[4], m_previousPV[3], m_previousPV[4], swapEnable[1], 0);
       // swap: data, PV, and previousPV; PV and previousPV can be directly set in RTL level to reduce cost.
    swapMsg(m_sync[1], m_sync[2], swapEnable[0]);
    swapPV(m_productiveVector1[1], m_productiveVector1[2], swapEnable[0]);
-   swapPV(m_previousPV[1], m_previousPV[2], swapEnable[0]);
+   //swapPV(m_previousPV[1], m_previousPV[2], swapEnable[0]);
    swapMsg(m_sync[3], m_sync[4], swapEnable[1]);
    swapPV(m_productiveVector1[3], m_productiveVector1[4], swapEnable[1]);
-   swapPV(m_previousPV[3], m_previousPV[4], swapEnable[1]);
+   //swapPV(m_previousPV[3], m_previousPV[4], swapEnable[1]);
 
    // stage 2
    swapEnable[0] = swapCtrl (m_sync[1], m_sync[3], m_productiveVector1[1], m_productiveVector1[3], 0);
    swapEnable[1] = swapCtrl (m_sync[2], m_sync[4], m_productiveVector1[2], m_productiveVector1[4], 0);
-   resolveConflict (m_productiveVector1[1], m_productiveVector1[3], m_previousPV[1], m_previousPV[3], swapEnable[0], 0);
-   resolveConflict (m_productiveVector1[2], m_productiveVector1[4], m_previousPV[2], m_previousPV[4], swapEnable[1], 0);
+   //resolveConflict (m_productiveVector1[1], m_productiveVector1[3], m_previousPV[1], m_previousPV[3], swapEnable[0], 0);
+   //resolveConflict (m_productiveVector1[2], m_productiveVector1[4], m_previousPV[2], m_previousPV[4], swapEnable[1], 0);
       // swap: data, PV, and previousPV; PV and previousPV can be directly set in RTL level to reduce cost.
    swapMsg(m_sync[1], m_sync[3], swapEnable[0]);
    swapPV(m_productiveVector1[1], m_productiveVector1[3], swapEnable[0]);
-   swapPV(m_previousPV[1], m_previousPV[3], swapEnable[0]);
+   //swapPV(m_previousPV[1], m_previousPV[3], swapEnable[0]);
    swapMsg(m_sync[2], m_sync[4], swapEnable[1]);
    swapPV(m_productiveVector1[2], m_productiveVector1[4], swapEnable[1]);
-   swapPV(m_previousPV[2], m_previousPV[4], swapEnable[1]);
+   //swapPV(m_previousPV[2], m_previousPV[4], swapEnable[1]);
    
 }
 
