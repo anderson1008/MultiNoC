@@ -146,6 +146,7 @@
       void computePV2 (TPZMessage* msg, unsigned index);
       Boolean routeComputation(TPZMessage* msg);
       void filterPV();
+      Boolean computePVLocal (TPZMessage* msg);
       void debugStop(unsigned pktId, unsigned flitId, TPZString router);
       
    protected:
@@ -161,6 +162,7 @@
       Boolean ** m_productiveVector1;
       Boolean ** m_productiveVector2;
       Boolean ** m_previousPV;
+      Boolean * m_LocalPVNI; // local PV in NI
       //unsigned m_bypass;
 
 };

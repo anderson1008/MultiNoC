@@ -130,6 +130,7 @@ void TPZSimpleRouterFlowBless :: initialize()
    m_productiveVector1=new Boolean*[m_ports+1]; // only 1-4 are effective
    m_productiveVector2=new Boolean*[m_ports+1];
    m_previousPV=new Boolean*[m_ports+1];
+   m_LocalPVNI=new Boolean[m_ports+1];
    //m_connEstablished=new Boolean[m_ports+1];
    //m_bypass = 0;
 
@@ -142,6 +143,7 @@ void TPZSimpleRouterFlowBless :: initialize()
       m_productiveVector1[i] = 0;
       m_productiveVector2[i] = 0;
       m_previousPV[i] = 0;
+      m_LocalPVNI[i] = false;
 
       m_productiveVector1[i] = new Boolean [m_ports+1];
       m_productiveVector2[i] = new Boolean [m_ports+1];
@@ -174,6 +176,8 @@ void TPZSimpleRouterFlowBless :: terminate()
 //   delete[] m_connections;
    delete[] m_sync;
    delete[] m_pipelineReg1;
+   delete[] m_LocalPVNI;
+   delete[] m_previousPV;
 //   delete[] m_connEstablished;
    delete[] m_productiveVector1;
    delete[] m_productiveVector2;
@@ -183,8 +187,8 @@ void  TPZSimpleRouterFlowBless :: debugStop(unsigned pktId, unsigned flitId, TPZ
 {
    unsigned stopPktId, stopFlitId;
    char * stopRouter;
-   stopPktId = 3040;
-   stopFlitId = 1;
+   stopPktId = 21;
+   stopFlitId = 4;
    Boolean stop;
 
    if (stopPktId==pktId && stopFlitId == flitId)
@@ -413,31 +417,73 @@ void TPZSimpleRouterFlowBless :: injectBypass()
    }
 }
 
+
+Boolean TPZSimpleRouterFlowBless ::computePVLocal (TPZMessage* msg)
+{
+   unsigned inPort, outPort;
+   Boolean found = false;
+   Boolean * availablePV = new Boolean [m_ports+1];
+   
+   debugStop(msg->getIdentifier(),  msg->flitNumber(), getComponent().asString());
+   
+   for   (outPort=1; outPort <= m_ports-2; outPort++) // port 1-4
+   {
+      m_LocalPVNI[outPort] = false;
+      availablePV[outPort] = false;
+      for (inPort=1; inPort < m_ports; inPort++) // channel 1-5
+         availablePV[outPort] = m_productiveVector2[inPort][outPort] | availablePV[outPort];
+      availablePV[outPort] = !availablePV[outPort];
+      if (getDeltaAbs(msg, outPort) && availablePV[outPort])
+      {
+         m_LocalPVNI[outPort] = true;
+         found = true;
+         break;
+      }
+   }
+   
+   delete [] availablePV;
+   return found;
+}
+
 Boolean TPZSimpleRouterFlowBless :: injectLocal()
 {
-
+   
    //********************************************************************************************************
    // check the local injection and put the flit into injection queue.
    // Those comming from injection only move forward if one input port is free
    //*****************************************************************************************************s])
+   
+   Boolean PVExist = false;
+   unsigned index, outPort;
+      
    if(m_sync[m_ports])
    {
       m_injectionQueue.enqueue(m_sync[m_ports]);
       m_sync[m_ports]=0;
    }
-
+   
    if (m_injectionQueue.numberOfElements() !=0)
    {
-      unsigned index;
-      for (index=1; index<=m_ports-1; index++) // check channel 1-5
+      TPZMessage * msg;
+      m_injectionQueue.firstElement(msg);
+      
+      routeComputation(msg);
+      PVExist = computePVLocal(msg);
+      if (PVExist)
       {
-         if (m_pipelineReg1[index])
-            continue;
-         m_injectionQueue.dequeue(m_pipelineReg1[index]); // not actual put into pipeline reg
-         routeComputation(m_pipelineReg1[index]);
-         computePV2(m_pipelineReg1[index],index);
-         break;
-      }
+         for (index=1; index<=m_ports-1; index++) // check channel 1-5
+         {
+            if (m_pipelineReg1[index])
+               continue;
+            m_injectionQueue.dequeue(m_pipelineReg1[index]); // not actual put into pipeline reg
+            for ( outPort = 1; outPort <= m_ports-1; outPort++) 
+               m_productiveVector2[index][outPort]=m_LocalPVNI[outPort];
+                   
+            //routeComputation(m_pipelineReg1[index]);
+            //computePV2(m_pipelineReg1[index],index);
+            break;
+         }
+       }  
    }
 
    if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports)->sendStopRightNow();

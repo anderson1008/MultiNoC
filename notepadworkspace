@@ -50,7 +50,6 @@
             <File name="TOPAZ\inc\TPZArray.inl" />
             <File name="TOPAZ\inc\TPZAttribute.hpp" />
             <File name="TOPAZ\inc\TPZBase.hpp" />
-            <File name="TOPAZ\inc\TPZBaseCollection.cpp" />
             <File name="TOPAZ\inc\TPZBaseCollection.hpp" />
             <File name="TOPAZ\inc\TPZBaseCollection.inl" />
             <File name="TOPAZ\inc\TPZBuilder.hpp" />
