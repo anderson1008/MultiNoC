@@ -220,9 +220,9 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    }
 
    cleanOutputInterfaces();
+   injectBypass(); // if call before ejectLocal(), allow bypass flit to claim the local port. (side effect: reduce the chance of local injection); Has to resolve conflict with all the other flits before injecting bypass flit.
    checkAllocation();
    ejectLocal();
-   injectBypass(); // if call before ejectLocal(), allow bypass flit to claim the local port. (side effect: reduce the change of local injection); nonconflict outPort has to be allocated before injection.
    injectLocal();
    sendFlit();
    clearPipeline2 ();
@@ -262,7 +262,7 @@ void TPZSimpleRouterFlowBless :: filterPV()
 {
    unsigned inPort, outPort;
    Boolean found;
-   for (inPort=1; inPort<=m_ports-2; inPort++)
+   for (inPort=1; inPort<=m_ports-1; inPort++)
    {
       found=false;
       for (outPort=1; outPort<m_ports+1; outPort++)
@@ -288,19 +288,9 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
    unsigned index;
    unsigned inPort, outPort;
    
-   /*
-   // Optional
-   // This part HAS to be replaced, which will increase the deflection rate
-   for (index = 2; index <=4; index++)
-      for (inPort = 1; inPort < index; inPort++)
-         for (outPort=1; outPort < m_ports+1; outPort++)
-            m_productiveVector2[index][outPort] = !m_productiveVector2[inPort][outPort] && m_productiveVector2[index][outPort]; 
-   // end optional
-   */
-   
    Boolean * PPVExist = new Boolean [m_ports-1];
    
-   for (inPort=1; inPort <= m_ports-2; inPort++) // channel 1-4
+   for (inPort=1; inPort <= m_ports-1; inPort++) // channel 1-5
    {
       PPVExist[inPort] = false;
       for (outPort=1; outPort < m_ports+1; outPort++)
@@ -315,7 +305,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
    for   (outPort=1; outPort < m_ports+1; outPort++)
    {
       availablePV[outPort] = false;
-      for (inPort=1; inPort <= m_ports-2; inPort++)
+      for (inPort=1; inPort <= m_ports-1; inPort++)
          availablePV[outPort] = m_productiveVector2[inPort][outPort] | availablePV[outPort];
       availablePV[outPort] = !availablePV[outPort];
    }
@@ -378,6 +368,25 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
          m_productiveVector2[4][5] = true; //bypass when flit2 is routed to productive port.
    }
 
+   
+   // Check flit 5
+   if (PPVExist[5]==false && (m_pipelineReg1[5] != 0))
+   {
+      if ((PPVExist[2]&&PPVExist[3]&&PPVExist[4])==true)
+         m_productiveVector2[5][5] = true; //bypass when flit2 is routed to productive port.
+      else
+      {
+         for (outPort = m_ports-2; outPort >= 1; outPort--) // not including bypass and local port
+         {
+            if (availablePV[outPort]==true)
+            {
+               m_productiveVector2[5][outPort] = true;
+               break;          
+            }
+         }
+      }  
+   }
+   
    delete [] PPVExist;
    delete [] availablePV;
 }
@@ -388,7 +397,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
 void TPZSimpleRouterFlowBless :: ejectLocal()
 {
    unsigned index;
-   for (index=1; index < m_ports-1; index++) // only check channel 1-4
+   for (index=1; index <= m_ports-1; index++) // only check channel 1-5
    {
       if (m_productiveVector2[index][6]==true && m_pipelineReg1[index]!=0)
       {
@@ -402,13 +411,35 @@ void TPZSimpleRouterFlowBless :: ejectLocal()
 }
 
 
+void TPZSimpleRouterFlowBless ::computePVBypass (TPZMessage* msg)
+{
+   unsigned inPort, outPort;
+   
+   // get the current unallocated ports
+   Boolean * availablePV = new Boolean [m_ports+1];
+   for   (outPort=1; outPort < m_ports+1; outPort++)
+   {
+      availablePV[outPort] = false;
+      for (inPort=1; inPort <= m_ports-2; inPort++)
+         availablePV[outPort] = m_productiveVector2[inPort][outPort] | availablePV[outPort];
+      availablePV[outPort] = !availablePV[outPort];
+      if ((getDeltaAbs(msg, outPort) && availablePV[outPort])==true)
+         m_productiveVector2[m_ports-1][outPort] = true;
+      else
+         m_productiveVector2[m_ports-1][outPort] = false;
+   }
+      
+   delete availablePV;
+}
+
 void TPZSimpleRouterFlowBless :: injectBypass()
 {
    if (m_sync[m_ports-1])
    {
       m_pipelineReg1[m_ports-1] = m_sync[m_ports-1];
       routeComputation(m_pipelineReg1[m_ports-1]);
-      computePV2(m_pipelineReg1[m_ports-1],m_ports-1);
+      computePVBypass(m_pipelineReg1[m_ports-1]);
+      //computePV2(m_pipelineReg1[m_ports-1],m_ports-1);
       m_sync[m_ports-1]=0;
    }
 }

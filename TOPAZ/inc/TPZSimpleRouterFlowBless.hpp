@@ -146,6 +146,7 @@
       void computePV2 (TPZMessage* msg, unsigned index);
       Boolean routeComputation(TPZMessage* msg);
       void filterPV();
+      void computePVBypass (TPZMessage* msg);
       void debugStop(unsigned pktId, unsigned flitId, TPZString router);
       
    protected:
