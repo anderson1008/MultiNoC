@@ -13,10 +13,10 @@ output   swap;
    0: flit0 has higher priority
    1: flit1 has higher priority
 */
-wire temp0, temp1;
+wire [`WIDTH_TIME-1:0] temp0, temp1;
 assign temp0 = (time0==0) ? `MAX_TIME : time0;
 assign temp1 = (time1==0) ? `MAX_TIME : time1;
 
-assign swap = (mode == 0) ? (temp1 <= temp0) : (temp0 <= temp1);
+assign swap = (mode == 0) ? (temp1 < temp0) : (temp0 < temp1);
 
 endmodule

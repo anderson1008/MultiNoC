@@ -3,7 +3,7 @@
 `include "global.v"
 
 
-module xbar6Ports (allocVector, din0, din1, din2, din3, din4, dinBypass, dout0, dout1, dout2, dout3, dout4, doutBypass);
+module Xbar6Ports (allocVector, din0, din1, din2, din3, din4, dinBypass, dout0, dout1, dout2, dout3, dout4, doutBypass);
 
 input [`NUM_PORT*`NUM_PORT-1:0] allocVector;
 input [`WIDTH_XBAR-1:0] dinBypass, din0, din1, din2, din3, din4;

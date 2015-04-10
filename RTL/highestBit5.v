@@ -3,7 +3,7 @@
 `include "global.v"
 
 // Not parameterized
-module highestBit (dataIn, dataOut);
+module highestBit5 (dataIn, dataOut);
 
 input    [4:0]      dataIn;
 output   [4:0]      dataOut;

@@ -1,16 +1,24 @@
 <NotepadPlus>
     <Project name="MultiNoCRTL">
-        <Folder name="srcVerilog">
+        <Folder name="src">
+            <File name="RTL\.synopsys_dc.setup" />
             <File name="RTL\arbiterPN.v" />
             <File name="RTL\compile_dc.tcl" />
+            <File name="RTL\computePPV.v" />
             <File name="RTL\demux1to2.v" />
             <File name="RTL\demux1to5.v" />
             <File name="RTL\demux1to6.v" />
             <File name="RTL\demuxWrapper1to2.v" />
             <File name="RTL\demuxWrapper1to5.v" />
             <File name="RTL\demuxWrapper1to6.v" />
+            <File name="RTL\ejectKillNInject.v" />
+            <File name="RTL\ejector.v" />
+            <File name="RTL\firstbit.v" />
             <File name="RTL\global.v" />
             <File name="RTL\highestBit.v" />
+            <File name="RTL\highestBit5.v" />
+            <File name="RTL\highestBit6.v" />
+            <File name="RTL\lastBit.v" />
             <File name="RTL\mux2to1.v" />
             <File name="RTL\mux5to1.v" />
             <File name="RTL\mux6to1.v" />
@@ -20,26 +28,20 @@
             <File name="RTL\outSelTrans.v" />
             <File name="RTL\permutationNetwork.v" />
             <File name="RTL\permuterBlock.v" />
-            <File name="RTL\portAlloc.v" />
-            <File name="RTL\portAllocLast.v" />
-            <File name="RTL\portAllocTop.v" />
-            <File name="RTL\portAllocWrapper.v" />
+            <File name="RTL\portAllocParallel.v" />
             <File name="RTL\routeComp.v" />
-            <File name="RTL\routeCompEast.v" />
-            <File name="RTL\routeCompLocal.v" />
-            <File name="RTL\routeCompNorth.v" />
-            <File name="RTL\routeCompSouth.v" />
-            <File name="RTL\routeCompWest.v" />
+            <File name="RTL\secondHighestBit.v" />
             <File name="RTL\tb_demux1to5.v" />
             <File name="RTL\tb_mux5to1.v" />
             <File name="RTL\tb_permutationNetwork.v" />
             <File name="RTL\tb_portAlloc.v" />
             <File name="RTL\tb_portAllocWrapper.v" />
+            <File name="RTL\tb_topBLESS.v" />
             <File name="RTL\tb_xbar5Ports.v" />
             <File name="RTL\tb_xbarCtrl.v" />
             <File name="RTL\topBLESS.v" />
             <File name="RTL\topMultiNoC.v" />
-            <File name="RTL\xbar5Ports.v" />
+            <File name="RTL\Xbar5Ports.v" />
             <File name="RTL\Xbar6Ports.v" />
             <File name="RTL\xbarCtrl.v" />
         </Folder>
@@ -50,7 +52,6 @@
             <File name="TOPAZ\inc\TPZArray.inl" />
             <File name="TOPAZ\inc\TPZAttribute.hpp" />
             <File name="TOPAZ\inc\TPZBase.hpp" />
-            <File name="TOPAZ\inc\TPZBaseCollection.cpp" />
             <File name="TOPAZ\inc\TPZBaseCollection.hpp" />
             <File name="TOPAZ\inc\TPZBaseCollection.inl" />
             <File name="TOPAZ\inc\TPZBuilder.hpp" />
@@ -101,7 +102,6 @@
             <File name="TOPAZ\inc\TPZInputStageFlow.hpp" />
             <File name="TOPAZ\inc\TPZInterfaz.hpp" />
             <File name="TOPAZ\inc\TPZMain.hpp" />
-            <File name="TOPAZ\inc\TPZMatrix.cpp" />
             <File name="TOPAZ\inc\TPZMatrix.hpp" />
             <File name="TOPAZ\inc\TPZMatrix.inl" />
             <File name="TOPAZ\inc\TPZMessage.hpp" />
@@ -1343,14 +1343,12 @@
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\compile_dc.tcl" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\demux1to2.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\demux1to5.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\demux1to6.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\demuxWrapper1to2.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\demuxWrapper1to5.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\global.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\highestBit.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\mux2to1.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\mux5to1.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\mux6to1.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\muxWrapper2to1.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\muxWrapper5to1.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\outSelTrans.v" />
@@ -1361,11 +1359,6 @@
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\portAllocTop.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\portAllocWrapper.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeComp.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeCompEast.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeCompLocal.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeCompNorth.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeCompSouth.v" />
-            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\routeCompWest.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\tb_demux1to5.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\tb_mux5to1.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\tb_permutationNetwork.v" />
@@ -1376,6 +1369,7 @@
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\topBLESS.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\xbar5Ports.v" />
             <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\xbarCtrl.v" />
+            <File name="C:\Anderson\GoogleDrive\NOC\BLESS\RTL\tb_topBLESS.v" />
         </Folder>
         <Folder name="TOPAZ">
             <Folder name="inc">

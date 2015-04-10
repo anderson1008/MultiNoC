@@ -4,26 +4,24 @@
 
 module outSelTrans (alloc, outSel);
 
-input [`NUM_PORT-1:0] alloc;
+input [`NUM_CHANNEL-1:0] alloc;
 output reg [`LOG_NUM_PORT-1:0] outSel;
 
 
 always @ * begin
    casex (alloc)
-      `NUM_PORT'b1xxxxx: 
-         outSel <= `LOG_NUM_PORT'd5;
-      `NUM_PORT'b01xxxx: 
+      `NUM_CHANNEL'b1xxxx: 
          outSel <= `LOG_NUM_PORT'd4;
-      `NUM_PORT'b001xxx: 
+      `NUM_CHANNEL'b01xxx: 
          outSel <= `LOG_NUM_PORT'd3;
-      `NUM_PORT'b0001xx: 
+      `NUM_CHANNEL'b001xx: 
          outSel <= `LOG_NUM_PORT'd2;
-      `NUM_PORT'b00001x: 
+      `NUM_CHANNEL'b0001x: 
          outSel <= `LOG_NUM_PORT'd1;
-      `NUM_PORT'b000001: 
+      `NUM_CHANNEL'b00001: 
          outSel <= `LOG_NUM_PORT'd0;          
       default:
-         outSel <= `LOG_NUM_PORT'd0;   
+         outSel <= `LOG_NUM_PORT'd7;   
    endcase
 end
 
