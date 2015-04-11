@@ -2,7 +2,7 @@
 
 `include "global.v"
 
-module topBLESS (clk, reset, dinW, dinE, dinS, dinN, dinLocal, dinBypass, PVBypass, PVLocal, doutW, doutE, doutS, doutN, doutLocal, doutBypass);
+module topBLESS (clk, reset, dinW, dinE, dinS, dinN, dinLocal, dinBypass, PVBypass, PVLocal, doutW, doutE, doutS, doutN, doutLocal, doutBypass, PVBypassOut);
 
 input clk, reset;
 input [`WIDTH_PORT-1:0] dinW, dinE, dinS, dinN;
@@ -11,6 +11,7 @@ input [`WIDTH_PV-1:0]   PVBypass, PVLocal;
 
 output [`WIDTH_PORT-1:0] doutW, doutE, doutS, doutN;
 output [`WIDTH_PORT-1:0]  doutLocal, doutBypass;
+output [`WIDTH_PV-1:0]  PVBypassOut;
 
 reg [`WIDTH_INTERNAL-1:0] r_dinW, r_dinE, r_dinS, r_dinN;
 reg [`WIDTH_INTERNAL-1:0] r_dinLocal, r_dinBypass;
@@ -117,6 +118,13 @@ portAllocParallel portAllocParallel (reqVector, validVector1, allocVector);
 // Must reform allocated PV since local port is not an option..
 // Starting from here, newAllocVector[4] is the bypassed port
 wire [`WIDTH_PORT-1:0] localOut;
+
+wire [`WIDTH_PORT-1:0] XbarPktIn [0:`NUM_CHANNEL-1];
+wire [`NUM_CHANNEL*`WIDTH_PV-1:0] XbarPVIn;
+
+local local (allocVector, validVector1, pipeline_reg1[0],pipeline_reg1[1],pipeline_reg1[2],pipeline_reg1[3], r_dinBypass[`WIDTH_PORT-1:0], r_dinLocal[`WIDTH_PORT-1:0], r_PVLocal, r_PVBypass, XbarPktIn[0], XbarPktIn[1], XbarPktIn[2], XbarPktIn[3], XbarPktIn[4], XbarPVIn, localOut, PVBypassOut);
+
+/*
 wire [`NUM_CHANNEL-1:0] localVector;
 wire [`NUM_CHANNEL-1:0] newAllocVector [0:`NUM_CHANNEL-1];
 
@@ -157,9 +165,27 @@ endgenerate
 assign XbarPktIn[4] = injectVector[4] ? r_dinLocal[`WIDTH_PORT-1:0] : r_dinBypass[`WIDTH_PORT-1:0];
 assign XbarPVIn[4*`NUM_CHANNEL+:`NUM_CHANNEL] = injectVector[4] ? LPV : newAllocVector[4];
 
+// forward PV of bypass flit
+reg [`WIDTH_PV-1:0] r_PVBypassOut;
+always @ * begin
+   if (XbarPVIn[4]) r_PVBypassOut <= pipeline_reg1[0][`POS_PV];
+   else if (XbarPVIn[9]) r_PVBypassOut <= pipeline_reg1[1][`POS_PV];
+   else if (XbarPVIn[14]) r_PVBypassOut <= pipeline_reg1[2][`POS_PV];
+   else if (XbarPVIn[19]) r_PVBypassOut <= pipeline_reg1[3][`POS_PV];
+   else if (XbarPVIn[24]) begin
+      if (injectVector[4]) r_PVBypassOut <= r_PVLocal;
+      else r_PVBypassOut <= r_PVBypass;
+   end
+   else
+      r_PVBypassOut <= 0;
+end
+*/
+
 // Switch Traversal
 wire [`WIDTH_PORT-1:0] XbarOutW, XbarOutE, XbarOutS, XbarOutN, XbarOutBypass;
 Xbar5Ports Xbar5Ports (XbarPVIn, XbarPktIn[0], XbarPktIn[1], XbarPktIn[2], XbarPktIn[3], XbarPktIn[4], XbarOutW, XbarOutE, XbarOutS, XbarOutN, XbarOutBypass);
+
+
 
 reg  [`WIDTH_PORT-1:0] r_doutW, r_doutE, r_doutS, r_doutN;
 reg [`WIDTH_PORT-1:0] r_doutLocal;
@@ -186,5 +212,6 @@ assign doutS = r_doutS;
 assign doutN = r_doutN;
 assign doutLocal = r_doutLocal;
 assign doutBypass = XbarOutBypass; // bypassed flit is only latched at the input.
+//assign PVBypassOut = r_PVBypassOut;
 
 endmodule

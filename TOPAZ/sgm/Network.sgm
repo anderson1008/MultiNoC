@@ -1,19 +1,19 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 <!--Simple Routers-->
 
-<TorusNetwork id="T44_BLESS_NOC" sizeX=4  sizeY=4  router="TORUS-BLESS" delay=0>
-<HeterogeneousNetwork id="T44_BLESS_MULT_NOC2" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC2" delay=0 replica=2>
-<HeterogeneousNetwork id="T44_BLESS_MULT_NOC3" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC3" delay=0 replica=3>
-<HeterogeneousNetwork id="T44_BLESS_MULT_NOC4" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC4" delay=0 replica=4>
+<TorusNetwork id="T44_BLESS_NOC" sizeX=4  sizeY=4  router="TORUS-BLESS" delay=1>
+<HeterogeneousNetwork id="T44_BLESS_MULT_NOC2" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC2" delay=1 replica=2>
+<HeterogeneousNetwork id="T44_BLESS_MULT_NOC3" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC3" delay=1 replica=3>
+<HeterogeneousNetwork id="T44_BLESS_MULT_NOC4" sizeX=4  sizeY=4  router="TORUS-BLESS-NOC4" delay=1 replica=4>
 
-<TorusNetwork id="T88_BLESS_NOC" sizeX=8  sizeY=8  router="TORUS-BLESS" delay=0>
-<HeterogeneousNetwork id="T88_BLESS_MULT_NOC2" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC2" delay=0 replica=2>
-<HeterogeneousNetwork id="T88_BLESS_MULT_NOC3" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC3" delay=0 replica=3>
-<HeterogeneousNetwork id="T88_BLESS_MULT_NOC4" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC4" delay=0 replica=4>
+<TorusNetwork id="T88_BLESS_NOC" sizeX=8  sizeY=8  router="TORUS-BLESS" delay=1>
+<HeterogeneousNetwork id="T88_BLESS_MULT_NOC2" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC2" delay=1 replica=2>
+<HeterogeneousNetwork id="T88_BLESS_MULT_NOC3" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC3" delay=1 replica=3>
+<HeterogeneousNetwork id="T88_BLESS_MULT_NOC4" sizeX=8  sizeY=8  router="TORUS-BLESS-NOC4" delay=1 replica=4>
 
-<TorusNetwork id="T1616_BLESS_NOC" sizeX=16  sizeY=16  router="TORUS-BLESS" delay=0>
-<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC2" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC2" delay=0 replica=2>
-<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC3" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC3" delay=0 replica=3>
-<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC4" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC4" delay=0 replica=4>
+<TorusNetwork id="T1616_BLESS_NOC" sizeX=16  sizeY=16  router="TORUS-BLESS" delay=1>
+<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC2" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC2" delay=1 replica=2>
+<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC3" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC3" delay=1 replica=3>
+<HeterogeneousNetwork id="T1616_BLESS_MULT_NOC4" sizeX=16  sizeY=16  router="TORUS-BLESS-NOC4" delay=1 replica=4>
 
 

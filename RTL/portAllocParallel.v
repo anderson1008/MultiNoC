@@ -53,6 +53,58 @@ endgenerate
 
 // ----------------------------------------------------------------- //
 parameter BYPASS = 6'b100000; 
+
+reg [`NUM_PORT-1:0] FPV [0:4];
+always @ * begin
+   if (validVector[0]) FPV[0] <= {1'b0,PV[0]};
+   else FPV[0] <= 0;
+   
+   if (validVector[1]) begin
+      if (PPVExist[1])
+         FPV[1] <= {1'b0,PPVi[1]};
+      else
+         FPV[1] <= BYPASS;
+   end
+   else
+      FPV[1] <= 0;
+
+   if (validVector[2]) begin
+      if (PPVExist[2])
+         FPV[2] <= {1'b0,PPVi[2]};
+      else if (PPVExist[1])
+         FPV[2] <= BYPASS;
+      else
+         FPV[2] <= {2'b0,APVFirst};
+   end
+   else
+      FPV[2] <= 0;
+
+   if (validVector[3]) begin
+      if (PPVExist[3])
+         FPV[3] <= {1'b0,PPVi[3]};
+      else if (PPVExist[1] & PPVExist[2])
+         FPV[3] <= BYPASS;
+      else if (PPVExist[1] ^ PPVExist[2])
+         FPV[3] <= {2'b0,APVFirst};
+      else
+         FPV[3] <= {2'b0,APVSecond};
+   end
+   else
+      FPV[3] <= 0;
+      
+   if (validVector[4]) begin
+      if (PPVExist[4])
+         FPV[4] <= {1'b0,PPVi[4]};
+      else if (BYPASS)
+         FPV[4] <= BYPASS;
+      else
+         FPV[4] <= {2'b0,APVLast};
+   end
+   else
+      FPV[4] <= 0;
+end
+
+/*
 wire [`NUM_PORT-1:0] FPV [0:4]; // Final PV for each of flits
 assign FPV[0] = validVector[0] ? {1'b0,PV[0]} : 0;
 assign FPV[1] = validVector[1] ? (PPVExist[1] ? {1'b0,PPVi[1]} : BYPASS) : 0;
@@ -68,7 +120,11 @@ assign FPV[3] = validVector[3] ? (PPVExist[3] ? {1'b0,PPVi[3]} : temp[2]) : 0;
 wire allExist;
 assign allExist = PPVExist[1]&&PPVExist[2]&&PPVExist[3];
 assign FPV[4] = validVector[4] ? (PPVExist[4] ? {1'b0,PPVi[4]} : (allExist ? BYPASS : {2'b0,APVLast})) : 0;
+*/
 // ----------------------------------------------------------------- //
+
+
+
 
 generate
    for (i=0; i<`NUM_CHANNEL; i=i+1) begin : aggregate

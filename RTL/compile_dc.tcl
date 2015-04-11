@@ -7,14 +7,15 @@
 #/**************************************************/
 
 #/* All verilog files, separated by spaces         */
-set my_verilog_files [list arbiterPN.v demux1to2.v demux1to5.v demuxWrapper1to2.v demuxWrapper1to5.v global.v highestBit.v mux2to1.v mux5to1.v muxWrapper2to1.v muxWrapper5to1.v outSelTrans.v permutationNetwork.v permuterBlock.v routeComp.v topBLESS.v Xbar5Ports.v xbarCtrl.v topMultiNoC.v secondHighestBit.v lastBit.v computePPV.v portAllocParallel.v firstbit.v highestBit5.v highestBit6.v ejector.v ejectKillNInject.v]
+set my_verilog_files [list arbiterPN.v demux1to2.v demux1to5.v demuxWrapper1to2.v demuxWrapper1to5.v global.v highestBit.v mux2to1.v mux5to1.v muxWrapper2to1.v muxWrapper5to1.v outSelTrans.v permutationNetwork.v permuterBlock.v routeComp.v topBLESS.v Xbar5Ports.v xbarCtrl.v topMultiNoC.v secondHighestBit.v lastBit.v computePPV.v portAllocParallel.v firstbit.v highestBit5.v highestBit6.v ejector.v ejectKillNInject.v local.v]
 
 #/* Top-level Module                               */
 #set my_toplevel demux1to6
-set my_toplevel topBLESS
+#set my_toplevel topBLESS
 #set my_toplevel portAllocParallel 
 #set my_toplevel xbar6Ports 
 #set my_toplevel  portAllocWrapper
+set my_toplevel  local
 
 #/* The name of the clock pin. If no clock-pin     */
 #/* exists, pick anything                          */
@@ -23,7 +24,7 @@ set my_clock_pin clk
 #/* Target frequency in MHz for optimization       */
 set my_clk_freq_MHz 500
 
-set my_period 1.03
+set my_period 0.2
 
 #/* Delay of input signals (Clock-to-Q, Package etc.)  */
 set my_input_delay_ns [expr $my_period*0.1]

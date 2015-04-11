@@ -44,6 +44,7 @@
             <File name="RTL\Xbar5Ports.v" />
             <File name="RTL\Xbar6Ports.v" />
             <File name="RTL\xbarCtrl.v" />
+            <File name="RTL\local.v" />
         </Folder>
     </Project>
     <Project name="MultiNoCTOPAZ">

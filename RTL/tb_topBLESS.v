@@ -11,9 +11,10 @@ reg [`WIDTH_PV-1:0]   PVBypass, PVLocal;
 
 wire [`WIDTH_PORT-1:0] doutW, doutE, doutS, doutN;
 wire [`WIDTH_PORT-1:0]  doutLocal, doutBypass;
+wire [`WIDTH_PV-1:0] PVBypassOut;
 
 
-topBLESS uut_topBLESS (clk, reset, dinW, dinE, dinS, dinN, dinLocal, dinBypass, PVBypass, PVLocal, doutW, doutE, doutS, doutN, doutLocal, doutBypass);
+topBLESS uut_topBLESS (clk, reset, dinW, dinE, dinS, dinN, dinLocal, dinBypass, PVBypass, PVLocal, doutW, doutE, doutS, doutN, doutLocal, doutBypass, PVBypassOut);
 
 
 initial begin
