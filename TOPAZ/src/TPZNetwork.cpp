@@ -178,8 +178,8 @@ TPZNetwork::TPZNetwork(const TPZComponentId& id, const TPZString& routerId,
             m_ProtocolMessagesTx(0), m_ProtocolMessagesInj(0),
             m_BufferWrite(0), m_BufferRead(0), m_VCArbitration(0),
             m_SWArbitration(0), m_SWTraversal(0), m_LinkTraversal(0),
-	    m_RouterBypass(0), m_IStageTraversal(0), m_OStageTraversal(0),
-	    m_MPTraversal(0),
+            m_RouterBypass(0), m_IStageTraversal(0), m_OStageTraversal(0),
+            m_MPTraversal(0), m_RouterDeflect(0),
             m_ProtocolMessagesRx(0), m_ProtocolAverageDistance(0),
             m_ProtocolMessagesDelayTotal(0), m_ProtocolMessagesDelayNetwork(0),
             m_ProtocolMessagesDelayBuffer(0), m_ProtocolMaxMessagesLatency(0),
@@ -2601,6 +2601,12 @@ void TPZNetwork :: incrEventCount( TPZTipoEvento evento)
      case MPTraversal:
          m_MPTraversal++;
      return;
+     case RouterDeflect:
+         m_RouterDeflect++;
+     return;
+     case RouteComputation:
+         m_RouteComputation++;
+     return;
    }
 }
 
@@ -2644,6 +2650,13 @@ double TPZNetwork :: getEventCount( TPZTipoEvento evento)
 
       case MPTraversal:
          return m_MPTraversal;
+         
+      case RouterDeflect:
+         return m_RouterDeflect;
+      
+     case RouteComputation:
+         return m_RouteComputation;
+
    }
 }
 //*************************************************************************

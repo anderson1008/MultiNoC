@@ -246,6 +246,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
          // end debug
          routeComputation(m_sync[inPort]);
          computePV1(m_sync[inPort],inPort);
+         ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouteComputation);
       }
    }
 
@@ -575,6 +576,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
             if (availablePV[outPort]==true)
             {
                m_productiveVector2[3][outPort] = true;
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterDeflect);
                break;
             }
       }
@@ -596,6 +598,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
                if (skip == 1)
                {
                   m_productiveVector2[4][outPort] = true;
+                  ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterDeflect);
                   break;
                }
                skip ++;
@@ -611,6 +614,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
             if (availablePV[outPort]==true)
             {
                m_productiveVector2[4][outPort] = true;
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterDeflect);
                break;
             }
          }
@@ -631,6 +635,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
             if (availablePV[outPort]==true)
             {
                m_productiveVector2[5][outPort] = true;
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterDeflect);
                break;          
             }
          }
@@ -721,6 +726,7 @@ Boolean TPZSimpleRouterFlowBless :: injectLocal()
          m_injectionQueue.dequeue(m_pipelineReg1[index]); // not actual put into pipeline reg
          routeComputation(m_pipelineReg1[index]);
          computePV2(m_pipelineReg1[index],index);
+         ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouteComputation);
          break;
       }
    }
@@ -757,6 +763,12 @@ void  TPZSimpleRouterFlowBless :: sendFlit()
             {
                outputInterfaz(outPort)->sendData(m_pipelineReg1[index]);
                outObtained=true;
+               if (outPort==5) //bypass
+                  ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterBypass); // include the bypass flit
+               else // network traffic
+                  ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal); //include deflected and normal network flits
+               ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal); // sum of RouterBypass and LinkTraversal should slightly greater than SWTraversal (since the bypassed flits may take local port which doesn't encounter SWTraversal.)
+                  
                break; //break outPort loop
             }
          }
@@ -880,7 +892,7 @@ Boolean TPZSimpleRouterFlowBless :: routeComputation(TPZMessage* msg)
    int deltaX;
    int deltaY;
    int deltaZ;
-
+   
    TPZPosition source= getOwnerRouter().getPosition();
    TPZPosition destination=msg->destiny();
    // A: This is the actual routing.

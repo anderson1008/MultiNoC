@@ -681,7 +681,13 @@ TPZString TPZSimulation :: writeSimulationStatus()
    TPZString("\n") + TPZString(latMediaMsgNetwork) +
    TPZString("\n") + TPZString(latMediaMsgBuffer) +
    TPZString("\n") + TPZString(m_Network->getMaximLatency(TPZNetwork::Message)) +
-   TPZString("\n") + TPZString(m_LastMessage) + TPZString("\n");
+   TPZString("\n") + TPZString(m_LastMessage) +
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterDeflect))+
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterBypass))+
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouteComputation))+
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::LinkTraversal))+
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal));  
+   
    //****************************************************************************************************************************
    // VERBOSITY=0
    //****************************************************************************************************************************
