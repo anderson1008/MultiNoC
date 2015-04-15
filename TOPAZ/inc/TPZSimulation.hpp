@@ -5,24 +5,24 @@
 //   This file is part of the TOPAZ network simulator, originallty developed
 //   at the Unviersity of Cantabria
 //
-//   TOPAZ shares a large proportion of code with SICOSYS which was 
+//   TOPAZ shares a large proportion of code with SICOSYS which was
 //   developed by V.Puente and J.M.Prellezo
 //
 //   TOPAZ has been developed by P.Abad, L.G.Menezo, P.Prieto and
 //   V.Puente
-// 
+//
 //  --------------------------------------------------------------------
 //
 //  If your use of this software contributes to a published paper, we
 //  request that you (1) cite our summary paper that appears on our
 //  website (http://www.atc.unican.es/topaz/) and (2) e-mail a citation
 //  for your published paper to topaz@atc.unican.es
-//  
+//
 //  If you redistribute derivatives of this software, we request that
 //  you notify us and either (1) ask people to register with us at our
 //  website (http://www.atc.unican.es/topaz/) or (2) collect registration
 //  information and periodically send it to us.
-//  
+//
 //   --------------------------------------------------------------------
 //
 //   TOPAZ is free software; you can redistribute it and/or
@@ -41,14 +41,14 @@
 //
 //   The GNU General Public License is contained in the file LICENSE.
 //
-// 	
+//
 //*************************************************************************
 //:
 //    File: TPZSimulation.hpp
 //
-//    Class: 
+//    Class:
 //
-//    Inherited from: 
+//    Inherited from:
 // :
 //*************************************************************************
 //end of header
@@ -84,14 +84,15 @@
    #include <unistd.h>
    #include <signal.h>
 
+
 //************************************************************************
 
    class TPZSimulationBuilder;
-   class TPZTrafficPattern;   
+   class TPZTrafficPattern;
 #ifdef PTOPAZ
    typedef TPZVector<TPZMessagePool*> TPZVectorPool;
 #endif
-         
+
 //************************************************************************
 
 
@@ -99,8 +100,7 @@
    {
       typedef TPZComponent Inhereited;
       friend class TPZSimulationBuilder;
-      
-      
+
    public:
       TPZSimulation(const TPZComponentId& id);
       virtual ~TPZSimulation();
@@ -115,58 +115,58 @@
       void setTrafficPattern(const TPZString& name);
       void setBimodalTraffic(const TPZString& params);
       void setTrafficPatternFile(const TPZString& name);
-      
+
       void overrideNetwork(const TPZString& name );
-      
-      Boolean injectProtocolMessage(const TPZPosition& source, const TPZPosition& destiny, unsigned index); 
-      
+
+      Boolean injectProtocolMessage(const TPZPosition& source, const TPZPosition& destiny, unsigned index);
+
       Boolean injectProtocolRandomMessage(const TPZPosition& source, unsigned type);
-      
+
       //*******************************************************************
       //ADDED FOR MULTIPLE TRAFFIC SOURCES SHARING THE ONLY VIRTUAL CHANNEL
       //*******************************************************************
-      
+
       void setProtocolMessTypes ( unsigned types )
       { m_ProtocolTypes = types; }
-      
+
       unsigned getProtocolMessTypes ()
       { return m_ProtocolTypes; }
-      
+
       //*******************************************************************
       //END OF ADDITION
       //*******************************************************************
-      
+
       //*******************************************************************
       //ADDED FOR BYPASS STATISTICS CALCULATION
       //*******************************************************************
       void incrPipelineNormal()
       { m_pipelineNormal++; }
-      
+
       void incrPipelineBypass()
       { m_pipelineBypass++; }
-      
+
       //*******************************************************************
       //END OF ADDITION
       //*******************************************************************
-      
+
       void* getExternalInfoAt(unsigned x, unsigned y, unsigned z=0)
       { return getNetwork()->getExternalInfoAt(x,y,z); }
-            
+
       virtual void* getExternalInfoAt(TPZPosition pos,int id=0)
       { return getNetwork()->getExternalInfoAt(pos); }
-            
+
       uTIME getCurrentTime() const
       { return m_Clock; }
-      
-      void setCurrentTime(uTIME time) 
+
+      void setCurrentTime(uTIME time)
       { m_Clock = time; }
-      
+
       void setNetwork(TPZNetwork* net)
       { m_Network = net; }
-      
+
       virtual TPZNetwork* getNetwork(int a=0) const
       { return m_Network; }
-      
+
       void setSimulationCycles(unsigned long cycles)
       { m_SimulationCycles = cycles; }
 
@@ -175,37 +175,37 @@
 
       void setStopSimulation(unsigned long cycles)
       { m_StopSimulation = cycles; }
-      
+
       void setStopSimulMessages(unsigned long cycles)
       { m_StopSimulMessages = cycles; }
-      
+
       unsigned long getStopSimulMessages()
       { return m_StopSimulMessages; }
-      
+
       void decrStopSimulMessages()
       { m_StopSimulMessages--; }
 
       void setBurstWidth (unsigned cycles )
-      { 
+      {
         setStopSimulation(cycles);
-        m_burstWidth = cycles; 
+        m_burstWidth = cycles;
       }
-      
+
       unsigned getBurstWidth()const
       { return m_burstWidth;}
-      
+
       void setBurstRepet (unsigned times)
       { m_burstNumber = times;}
-      
+
       unsigned getBurstRepet() const
       { return m_burstNumber;}
-      
+
       void setResetStats(unsigned long cycles)
       { m_resetStats = cycles; }
-      
+
       void setSeed(unsigned seed)
       { m_Seed = seed; }
-      
+
       void setMessageLength(unsigned length)
       { m_MessageLength = length; }
 
@@ -229,20 +229,20 @@
 
       void setDefaultLoadSupply(double value)
       { m_defaultLoad = value; }
-      
+
       void setLoadSupply(double value);
-      
+
       double defaultLoadProb() const
       { return m_defaultProb; }
 
       void setDefaultLoadProb(double value)
       { m_defaultProb = value; }
-      
+
       void setLoadProb(double value);
-      
+
       void setVerbosity(unsigned value)
       { m_verbosity = value; }
-      
+
       void setShowState(Boolean value)
       { m_ShowState = value; }
 
@@ -251,31 +251,31 @@
 
       void setShowBufferState(Boolean value)
       { m_ShowBufferState = value; }
-      
+
       unsigned getFlitSize( )const
       { return m_flitSize; }
-                  
+
       void setClock(float value)
       { m_clockTR = (unsigned long)value; }
-      
+
       float getClock( )const
       { return m_clockTR; }
-      
+
       void setFlitSize(unsigned value)
       { m_flitSize = value; }
-                  
+
       void setBuffersFileName(const TPZString& name);
-      
+
       void setAsciiOutputFormat()
       {
          m_binaryOutputFormat=false;
       }
-      
+
       Boolean getAsciiOutputFormat()
       {
          return m_binaryOutputFormat;
       }
-      
+
       void enableSeed()
       {
          srand(m_Seed);
@@ -283,43 +283,43 @@
       }
 
       void setBufferSize(unsigned size)
-      { 
+      {
         if(m_Network)
-        { 
-           m_Network->setBufferSize(size); 
+        {
+           m_Network->setBufferSize(size);
            m_bufferSize=size;
         }
       }
-     
-     
+
+
      unsigned getBufferSize()const
      {return m_bufferSize;}
-     
+
      Boolean needToUnify() const
      {return m_unifyNetworks;}
-     
+
      double getNetworkClockRatioSGML() const
      { return m_RouterProcesorRatio; }
-     
+
 
      TPZGlobalData& globalData(TPZNetwork* net=0) const
      { return (TPZGlobalData&)m_GlobalData; }
-      
+
      void setNumberOfMsgs(unsigned long a)
      {
         m_mensajestraza=a;
      }
-     
+
      void setDumpTraza(int a)
      {
         m_startDump=a;
      }
-     
+
      int getDumpTraza() const
      {
         return m_startDump;
      }
-     
+
      void discardTraffic ()
      {
         m_discardTraffic = true;
@@ -329,53 +329,53 @@
      {
         return m_discardTraffic;
      }
-      
+
       // Run time information
       DEFINE_RTTI(TPZSimulation);
-      
+
       void setLastMessage (uTIME time)
       { m_LastMessage = time; }
-      
+
       uTIME getLastMessage ()
       { return m_LastMessage; }
-      
+
       void incrTerminatingMsgNumber ()
       { m_terminatingMsgNumber++; }
-      
+
       unsigned getTerminatingMsgNumber ()
       { return m_terminatingMsgNumber; }
-      
+
       Boolean getisRafagaMode ()
       { return m_isRafagaMode; }
-      
+
       TPZMessagePool& getMessagePool() const;
-      
+
       void initializePool(unsigned size);
 
       double getLoad() const
       {
          return m_q;
       }
-      
+
 #ifdef PTOPAZ
 
       unsigned getNumberThreads ()
       {
          return m_numberThreads;
       }
-      
+
       void setNumberThreads (unsigned n)
       {
          m_numberThreads = n;
       }
-      
+
       TPZMessagePool& getMessagePool(unsigned n) const;
-      
+
 #endif
-                  
+
       TPZTrafficPattern* getTrafficPattern() const
       { return m_TrafficPattern; }
-   
+
    protected:
 
 
@@ -384,17 +384,17 @@
 
       Boolean showBufferState() const
       { return m_ShowBufferState; }
-      
+
       unsigned showResolutionBS() const
       { return m_BufferStateResolution;}
-      
+
       void      writeBufferStatus();
       TPZString convertSeconds(double secs);
       void      writeCurrentData();
-            
-      static TPZSimulation* newFrom( const TPZTag* tag, 
+
+      static TPZSimulation* newFrom( const TPZTag* tag,
                                      INDEX& i);
-      void parseTags(TPZSimulation *simulation,const TPZTag* tag, 
+      void parseTags(TPZSimulation *simulation,const TPZTag* tag,
                                      INDEX& i);
 
       TPZNetwork*        m_Network;
@@ -402,7 +402,7 @@
 
    protected:
       TPZTrafficPattern* m_TrafficPattern;
-      
+
       Boolean            m_isRafagaMode;
       unsigned short     m_ProtocolTypes;
       unsigned long      m_SimulationCycles;
@@ -433,13 +433,13 @@
       unsigned           m_burstNumber;
       unsigned           m_bufferSize;
       Boolean            m_discardTraffic;
-            
+
       unsigned           m_terminatingMsgNumber;
       uTIME              m_LastMessage;
-      
+
       unsigned long      m_pipelineNormal;
       unsigned long      m_pipelineBypass;
-      
+
       //Ruby Member
       double             m_RouterProcesorRatio;
       Boolean            m_unifyNetworks;
@@ -456,7 +456,7 @@
       //profiling functions taken from GEMS
          static double process_memory_total()
          {
-           const double MULTIPLIER = 4096.0/(1024.0*1024.0); // 4kB page size, 1024*1024 bytes per MB, 
+           const double MULTIPLIER = 4096.0/(1024.0*1024.0); // 4kB page size, 1024*1024 bytes per MB,
            ifstream proc_file;
            proc_file.open("/proc/self/statm");
            int total_size_in_pages = 0;
@@ -468,7 +468,7 @@
 
          static double process_memory_resident()
          {
-           const double MULTIPLIER = 4096.0/(1024.0*1024.0); // 4kB page size, 1024*1024 bytes per MB, 
+           const double MULTIPLIER = 4096.0/(1024.0*1024.0); // 4kB page size, 1024*1024 bytes per MB,
            ifstream proc_file;
            proc_file.open("/proc/self/statm");
            int total_size_in_pages = 0;

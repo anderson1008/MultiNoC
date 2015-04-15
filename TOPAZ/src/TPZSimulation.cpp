@@ -72,7 +72,7 @@
 #endif
 
 #include <stdio.h>
-
+#include <math.h>
 //*************************************************************************
 
    #define SPACES " "
@@ -631,7 +631,79 @@ TPZString TPZSimulation :: writeSimulationStatus()
       nodes=nodes*getNetwork()->getSizeY();
    if(getNetwork()->getSizeZ()!=0)
       nodes=nodes*getNetwork()->getSizeZ();
-
+      
+   double replicaNum = 2;
+   double clockScaleFactor = 1.27;
+   
+   // For Power evaluation      
+   // Power obtained from Synopsis Design Compiler
+   // Unit: uW
+   // Link power obtained from DSENT
+   double RCStaticUnitPower = 0.144;
+   double PNStaticUnitPower = 33.055;
+   double PAStaticUnitPower = 1.81;
+   double LocalStaticUnitPower = 20.18;
+   double XbarStaticUnitPower = 57.91;
+   double LatchStaticUnitPower = 17.17;
+   double LinkStaticUnitPower = 61.019;  
+   double RCDynamicUnitPower = 5.74;
+   double PNDynamicUnitPower = 4019.6;
+   double PADynamicUnitPower = 105.47;
+   double LocalDynamicUnitPower = 1663.75;
+   double XbarDynamicUnitPower = 2466.09;
+   double LatchDynamicUnitPower = 4020.44;
+   double LinkDynamicUnitPower = 6007.47;
+   double toggleRateDefault = 0.1;
+   // Quantity of each units
+   // Depends on the size of the network
+   double RCNum = 5 * nodes * replicaNum;
+   double PNNum = nodes * replicaNum;
+   double PANum = nodes * replicaNum;
+   double LocalNum = nodes * replicaNum;
+   double XbarNum = nodes * replicaNum;
+   double LatchNum = 15 * nodes * replicaNum; // this is an estimation, but showing the upper bound of power consumed by latches.
+   double LinkNum = 4 * nodes * replicaNum;
+   double clockRate = 1.04 * pow (10, -9); // in second
+   double simulTime = clockRate * m_Clock; // overall simulation time
+   // actual power computation
+   double RCStatic = RCStaticUnitPower * RCNum * simulTime;
+   double PNStatic = PNStaticUnitPower * PNNum * simulTime;
+   double PAStatic = PAStaticUnitPower * PANum * simulTime;
+   double LocalStatic = LocalStaticUnitPower * LocalNum * simulTime;
+   double XbarStatic = XbarStaticUnitPower * XbarNum * simulTime;
+   double LatchStatic = LatchStaticUnitPower * LatchNum * simulTime;
+   double LinkStatic = LinkStaticUnitPower * LinkNum * simulTime;
+   
+   double RCToggleRate =  m_Network->getEventCount( TPZNetwork::RouteComputation) / (RCNum * m_Clock);
+   double PNToggleRate =  m_Network->getEventCount( TPZNetwork::LinkTraversal) / (PNNum * m_Clock);
+   double PAToggleRate =  m_Network->getEventCount( TPZNetwork::SWTraversal) / (PANum * m_Clock);
+   double LocalToggleRate = (m_Network->getMessagesTx() + m_Network->getMessagesRx()) * m_PacketLength / (LocalNum * m_Clock);
+   double XbarToggleRate = m_Network->getEventCount( TPZNetwork::SWTraversal) / (XbarNum * m_Clock);
+   double LatchToggleRate = (m_Network->getEventCount( TPZNetwork::LinkTraversal) * 3 + (m_Network->getMessagesTx() + m_Network->getMessagesRx()) * m_PacketLength * 2 + m_Network->getEventCount( TPZNetwork::RouterDeflect)) / (LatchNum * m_Clock); // Each network flit toggle all 3 latches at each router. Local inject and eject flits toggle 2 latches. Bypass flit toggle only latch once.
+   double LinkToggleRate = m_Network->getEventCount( TPZNetwork::LinkTraversal) / (LinkNum * m_Clock);
+   
+   double RCDynamic = RCDynamicUnitPower / toggleRateDefault * RCToggleRate * simulTime;
+   double PNDynamic = PNDynamicUnitPower / toggleRateDefault * PNToggleRate * simulTime;
+   double PADynamic = PADynamicUnitPower / toggleRateDefault * PAToggleRate * simulTime;
+   double LocalDynamic = LocalDynamicUnitPower / toggleRateDefault * LocalToggleRate * simulTime;
+   double XbarDynamic = XbarDynamicUnitPower / toggleRateDefault * XbarToggleRate * simulTime;
+   double LatchDynamic = LatchDynamicUnitPower / toggleRateDefault * LatchToggleRate * simulTime;
+   double LinkDynamic = LinkDynamicUnitPower * LinkToggleRate * simulTime;
+   
+   double RCOverall = RCStatic + RCDynamic;
+   double PNOverall = PNStatic + PNDynamic;
+   double PAOverall = PAStatic + PADynamic;
+   double LocalOverall = LocalStatic + LocalDynamic;
+   double XbarOverall = XbarStatic + XbarDynamic;
+   double LatchOverall = LatchStatic + LatchDynamic;
+   double LinkOverall = LinkStatic + LinkDynamic;
+   
+   double overallLeakage = RCStatic + PNStatic + PAStatic + LocalStatic + XbarStatic + LatchStatic + LinkStatic;
+   double overallDynamic = RCDynamic + PNDynamic + PADynamic + LocalDynamic + XbarDynamic + LatchDynamic + LinkDynamic;
+   double overallPower = overallLeakage + overallDynamic;
+   
+   // end Power evalutation     
+      
    double latMediaMsgTotal = m_Network->getTotalDelay(TPZNetwork::Message) / double(m_Network->getMessagesRx());
 
    double latMediaMsgNetwork = m_Network->getNetworkDelay(TPZNetwork::Message) / double(m_Network->getMessagesRx());
@@ -681,12 +753,40 @@ TPZString TPZSimulation :: writeSimulationStatus()
    TPZString("\n") + TPZString(latMediaMsgNetwork) +
    TPZString("\n") + TPZString(latMediaMsgBuffer) +
    TPZString("\n") + TPZString(m_Network->getMaximLatency(TPZNetwork::Message)) +
-   TPZString("\n") + TPZString(m_LastMessage) +
+   TPZString("\n") + TPZString(m_LastMessage) + TPZString("\n") +
+   TPZString("\n") + TPZString(latMediaMsgTotal/clockScaleFactor) +
+   TPZString("\n") + TPZString(throughputNormalizado/clockScaleFactor/replicaNum) +
+   TPZString("\n") + TPZString(simulTime) + TPZString("\n") +
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterDeflect))+
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterBypass))+
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouteComputation))+
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::LinkTraversal))+
-   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal));  
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal)) +
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterDeflect)/m_Network->getEventCount( TPZNetwork::SWTraversal)) + TPZString("\n") +
+   TPZString("\n") + TPZString(RCStatic) +
+   TPZString("\n") + TPZString(PNStatic) +
+   TPZString("\n") + TPZString(PAStatic) +
+   TPZString("\n") + TPZString(LocalStatic) +
+   TPZString("\n") + TPZString(XbarStatic) +
+   TPZString("\n") + TPZString(LatchStatic) +
+   TPZString("\n") + TPZString(LinkStatic) + TPZString("\n") +
+   TPZString("\n") + TPZString(RCDynamic) +
+   TPZString("\n") + TPZString(PNDynamic) +
+   TPZString("\n") + TPZString(PADynamic) +
+   TPZString("\n") + TPZString(LocalDynamic) +
+   TPZString("\n") + TPZString(XbarDynamic) +
+   TPZString("\n") + TPZString(LatchDynamic) +
+   TPZString("\n") + TPZString(LinkDynamic) + TPZString("\n") +
+   TPZString("\n") + TPZString(RCOverall) +
+   TPZString("\n") + TPZString(PNOverall) +
+   TPZString("\n") + TPZString(PAOverall) +
+   TPZString("\n") + TPZString(LocalOverall) +
+   TPZString("\n") + TPZString(XbarOverall) +
+   TPZString("\n") + TPZString(LatchOverall) +
+   TPZString("\n") + TPZString(LinkOverall) + TPZString("\n") +
+   TPZString("\n") + TPZString(overallLeakage) +
+   TPZString("\n") + TPZString(overallDynamic) +
+   TPZString("\n") + TPZString(overallPower);  
    
    //****************************************************************************************************************************
    // VERBOSITY=0

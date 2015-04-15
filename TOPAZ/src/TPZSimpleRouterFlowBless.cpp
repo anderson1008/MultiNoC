@@ -209,17 +209,17 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
    // Pipeline Stage 2: Port Allocation & Switch Traversal
    // the egree/priority queue must remain completely empty, every message must find an output port.
    //**********************************************************************************************************
-   
+
    // for debug
    for (inPort=1; inPort <= m_ports-2; inPort++)
    {
       if (m_pipelineReg1[inPort])
-         debugStop(m_pipelineReg1[inPort]->getIdentifier(),m_pipelineReg1[inPort]->flitNumber(),getComponent().asString());  
+         debugStop(m_pipelineReg1[inPort]->getIdentifier(),m_pipelineReg1[inPort]->flitNumber(),getComponent().asString());
    }
    // end debug
-   
+
    cleanOutputInterfaces();
-   injectBypass(); 
+   injectBypass();
    checkAllocation();
    ejectLocal();
    injectLocal();
@@ -242,7 +242,7 @@ Boolean TPZSimpleRouterFlowBless :: inputReading()
       if(m_sync[inPort])
       {
          // for debug
-         debugStop(m_sync[inPort]->getIdentifier(),m_sync[inPort]->flitNumber(),getComponent().asString());  
+         debugStop(m_sync[inPort]->getIdentifier(),m_sync[inPort]->flitNumber(),getComponent().asString());
          // end debug
          routeComputation(m_sync[inPort]);
          computePV1(m_sync[inPort],inPort);
@@ -297,7 +297,7 @@ void TPZSimpleRouterFlowBless :: permutationNetwork()
    swapMsg(m_sync[2], m_sync[4], swapEnable[1]);
    swapPV(m_productiveVector1[2], m_productiveVector1[4], swapEnable[1]);
    //swapPV(m_previousPV[2], m_previousPV[4], swapEnable[1]);
-   
+
 }
 
 
@@ -320,9 +320,9 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
       hasPV0 = hasPV0 | PV0[index];
       hasPV1 = hasPV1 | PV1[index];
    }
-   
+
    //   Strictly honor oldest first
-   
+
    if ((msg0 == 0 && msg1 == 0) )
       return false;
    else if (msg0 == 0 && msg1 != 0)       // msg1 has higher priority
@@ -339,7 +339,7 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
       else if (mode == 1)
          return true;
    }
-   else 
+   else
    {
       unsigned timeGen0, timeGen1;
       timeGen0 = msg0->generationTime();
@@ -352,21 +352,21 @@ Boolean  TPZSimpleRouterFlowBless :: swapCtrl (TPZMessage * msg0, TPZMessage * m
             return false;
       }
       else if (timeGen0 == timeGen1)
-      {  
+      {
          if (hasPV0)                // msg0 has higher priority
          {
             if (mode == 0)
                return false;
             else if (mode == 1)
                return true;
-         }      
+         }
          else                       // msg1 has higher priority
          {
             if (mode == 0)
                return true;
             else if (mode == 1)
                return false;
-         }       
+         }
       }
       else
       {
@@ -422,7 +422,7 @@ void  TPZSimpleRouterFlowBless :: resolveConflict (Boolean * &PV0, Boolean * &PV
       }
       else if ((swapEnable == false && mode == 1) || (swapEnable == true && mode == 0))
       {
-         PV1[i] = PPV1Exist ? PPV1[i] : PV1[i];        
+         PV1[i] = PPV1Exist ? PPV1[i] : PV1[i];
          PV0[i] = PPV1Exist ? (!PPV1[i] & !previousPV1[i] & PV0[i]) : (!PV1[i] & !previousPV1[i] & PV0[i]);
          previousPV1[i] = false;
          previousPV0[i] = PV1[i];
@@ -497,7 +497,7 @@ void TPZSimpleRouterFlowBless :: pipelining()
 //
 //  d: inject bypass flit to channel 5
 //     RC is done and conflict is resolved against all other non-local flits.
-//     if called before ejectLocal(), it is allowed to claim the local port if no other non-local flit is locally destined. 
+//     if called before ejectLocal(), it is allowed to claim the local port if no other non-local flit is locally destined.
 //     Advantage: the PV of the bypass flit will be taken into account during final port allocation (in checkAllocation()). It will allow bypass flit to claim the productive port when there is no conflict among all other non-local flits, although it may/may not be older than the others.
 //*************************************************************************
 
@@ -505,6 +505,9 @@ void TPZSimpleRouterFlowBless :: injectBypass()
 {
    if (m_sync[m_ports-1])
    {
+      // in the real hardware implementation, the productive vector of the bypass flit \
+      is forwarded directly from the other sub router. So there is no need to increase the \
+      RC counts.
       m_pipelineReg1[m_ports-1] = m_sync[m_ports-1];
       routeComputation(m_pipelineReg1[m_ports-1]);
       computePVBypass(m_pipelineReg1[m_ports-1]);
@@ -530,10 +533,10 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
 
    unsigned index;
    unsigned inPort, outPort;
-   
+
    // Must keep only one productive port per flit
    filterPV();
-   
+
    // Resolve conflicts among all flits except the oldest flit in channel 1 statically
    // The productive ports of low priority flits must be masked out by high priority flit.
    // Must statically assign a port to either bypass or deflect the flit.
@@ -542,7 +545,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
          for (outPort=1; outPort < m_ports+1; outPort++)
             m_productiveVector2[index][outPort] = !m_productiveVector2[inPort][outPort] && m_productiveVector2[index][outPort];
    // end Resolve conflict
-   
+
    // Check if the productive port is available for a flit
    Boolean * PPVExist = new Boolean [m_ports-1];
    for (inPort=1; inPort <= m_ports-1; inPort++) // channel 1-5
@@ -622,7 +625,7 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
       else if ((PPVExist[2]&PPVExist[3])==true)
          m_productiveVector2[4][5] = true; //bypass when flit2 is routed to productive port.
    }
-   
+
    // Check flit 5
    if (PPVExist[5]==false && (m_pipelineReg1[5] != 0))
    {
@@ -636,12 +639,12 @@ void TPZSimpleRouterFlowBless :: checkAllocation()
             {
                m_productiveVector2[5][outPort] = true;
                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::RouterDeflect);
-               break;          
+               break;
             }
          }
-      }  
+      }
    }
-   
+
    delete [] PPVExist;
    delete [] availablePV;
 }
@@ -733,6 +736,10 @@ Boolean TPZSimpleRouterFlowBless :: injectLocal()
 
    if (m_injectionQueue.numberOfElements() !=0) inputInterfaz(m_ports)->sendStopRightNow();
    else inputInterfaz(m_ports)->clearStopRightNow();
+
+   /*
+      if inject msg before port allocation, the deflection ratee tend to be lower. However, the throughput will be sigificantly degraded since throttling occurs quite often.
+   */
 }
 
 //*************************************************************************
@@ -755,7 +762,7 @@ void  TPZSimpleRouterFlowBless :: sendFlit()
          // for debug
          debugStop(m_pipelineReg1[index]->getIdentifier(),m_pipelineReg1[index]->flitNumber(),getComponent().asString());
          // end debug
-         
+
          outObtained = false;
          for ( outPort = 1; outPort <= m_ports-1; outPort++) // outPort 1-5; local has been removed.
          {
@@ -768,12 +775,12 @@ void  TPZSimpleRouterFlowBless :: sendFlit()
                else // network traffic
                   ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::LinkTraversal); //include deflected and normal network flits
                ((TPZNetwork*)(getOwnerRouter().getOwner()))->incrEventCount( TPZNetwork::SWTraversal); // sum of RouterBypass and LinkTraversal should slightly greater than SWTraversal (since the bypassed flits may take local port which doesn't encounter SWTraversal.)
-                  
+
                break; //break outPort loop
             }
          }
       }
-      
+
       // This is just for precaution.
       if (outObtained==false)
       {
@@ -803,7 +810,7 @@ void TPZSimpleRouterFlowBless :: clearPipeline2 ()
    for( inPort = 1; inPort < m_ports+1; inPort++) // channel 1-5
    {
       m_pipelineReg1[inPort] = 0;
-      for ( outPort = 1; outPort < m_ports+1; outPort++) 
+      for ( outPort = 1; outPort < m_ports+1; outPort++)
          m_productiveVector2[inPort][outPort] = false;
    }
 }
@@ -811,7 +818,7 @@ void TPZSimpleRouterFlowBless :: clearPipeline2 ()
 void TPZSimpleRouterFlowBless ::computePVBypass (TPZMessage* msg)
 {
    unsigned inPort, outPort;
-   
+
    // get the current unallocated ports
    Boolean * availablePV = new Boolean [m_ports+1];
    for   (outPort=1; outPort < m_ports+1; outPort++)
@@ -825,7 +832,7 @@ void TPZSimpleRouterFlowBless ::computePVBypass (TPZMessage* msg)
       else
          m_productiveVector2[m_ports-1][outPort] = false;
    }
-      
+
    delete availablePV;
 }
 
@@ -835,9 +842,9 @@ void TPZSimpleRouterFlowBless ::computePV2 (TPZMessage* msg, unsigned index)
    unsigned inPort, outPort;
    Boolean found = false;
    Boolean * availablePV = new Boolean [m_ports+1];
-   
+
    debugStop(msg->getIdentifier(),  msg->flitNumber(), getComponent().asString());
-   
+
    for   (outPort=1; outPort < m_ports; outPort++) // port 1-5
    {
       availablePV[outPort] = false;
@@ -892,7 +899,7 @@ Boolean TPZSimpleRouterFlowBless :: routeComputation(TPZMessage* msg)
    int deltaX;
    int deltaY;
    int deltaZ;
-   
+
    TPZPosition source= getOwnerRouter().getPosition();
    TPZPosition destination=msg->destiny();
    // A: This is the actual routing.
