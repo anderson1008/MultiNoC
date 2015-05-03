@@ -1,5 +1,47 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 
+
+<Simulation id="T44-BLESS-NOC">
+   <Network            id="T44_BLESS_NOC">
+   <SimulationCycles   id=0>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=EMPTY numMessTypes=5>
+   <Seed               id=113>
+   <Load               id=0.1>
+   <MessageLength      id=1>
+   <PacketLength       id=2>
+   <LinkWidth          id=16>
+   <FlitSize           id=5>
+   <NetworkClockRatio  id=1>
+   <UnifyNetworks      id=1>
+</Simulation>
+
+<Simulation id="T44-BLESS-MULT-NOC2">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=0>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=EMPTY numMessTypes=5>
+   <Seed               id=113>
+   <Load               id=0.1>
+   <MessageLength      id=1>
+   <PacketLength       id=4>
+   <LinkWidth          id=16>
+   <FlitSize           id=5>
+   <NetworkClockRatio  id=1>
+   <UnifyNetworks      id=1>
+   <ResetStats         id=100000000> 
+</Simulation>
+
+
+
+
+
+
+
+
+
+
+
 <!-- 4x4 Torus, Bubble Flow control , with multicast support, simple router -->
 <Simulation id="T44-CT-MC">
    <Network            id="T44_CT_NOC_MC">

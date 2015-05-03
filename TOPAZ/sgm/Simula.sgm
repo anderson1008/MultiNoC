@@ -1,5 +1,171 @@
 <!-- See http://www.atc.unican.es/topaz/ for more information -->
 
+<!-- LinkWidth indicates size of the flits (in bytes). This tag does not have any effect in non-trace simulation.-->
+
+<!-- ***-****-***-T stands for Trace -->
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-blackscholes">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="blackscholes.trace" numMessTypes=4>
+   <Seed               id=113>
+   <Load               id=0.1>
+   <MessageLength      id=1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-bodytrack">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="bodytrack.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-canneal">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="canneal.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-dedup">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="dedup.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-facesim">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="facesim.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-ferret">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="ferret.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-fluidanimate">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="fluidanimate.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-freqmine">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="freqmine.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-rtview">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="rtview.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-streamcluster">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="streamcluster.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-swaptions">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="swaptions.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-vips">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="vips.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+<Simulation id="T44-BLESS-MULTI-NOC2-T-x264">
+   <Network            id="T44_BLESS_MULT_NOC2">
+   <SimulationCycles   id=100000000000000000>
+   <StopInjectionAfterMsg id=0>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="x264.trace" numMessTypes=4>
+   <Seed               id=113>
+   <MessageLength      id=1>
+   <Load               id=0.1>
+   <LinkWidth          id=16>
+</Simulation>
+
+
+
+
 <Simulation id="T44-BLESS-NOC">
    <Network            id="T44_BLESS_NOC">
    <SimulationCycles   id=1000000>

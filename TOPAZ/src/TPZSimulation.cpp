@@ -461,13 +461,28 @@ void TPZSimulation :: run(uTIME time)
 
       for ( m_Clock=1; m_Clock<=m_SimulationCycles; m_Clock++ )
       {
+      
+         ///Stop when all injected msg are received
+          if(getNetwork()->getMessagesTx()-getNetwork()->getMessagesRx()==0 )
+			           
+         // if( getNetwork()->getMessagesRx() == 40000000)
+			 {    
+             if(m_Clock>=100)
+               m_SimulationCycles=m_Clock;  
+          }
+          
          getTrafficPattern()->injectMessage();
 	     getNetwork()->run(m_Clock);
          writeCurrentData();
 
          m_Clock++;// Delay modeling processor speed is in the
                    //TPZTraffficPatternTrace, when initializing the trace
-
+         
+         if (getNetwork()->getMessagesRx() % 10000 == 0)
+			{
+				cout << getNetwork()->getMessagesRx() << endl << endl;
+			}
+         
       }
    }
    else
@@ -747,8 +762,9 @@ TPZString TPZSimulation :: writeSimulationStatus()
    TPZString("\n") + TPZString(distanciaMedia) +
    TPZString("\n") + TPZString(m_Network->getMessagesTx()) +
    TPZString("\n") + TPZString(m_Network->getMessagesRx()) +
-   TPZString("\n") + TPZString(m_Network->getMessagesToTx()) +
-   TPZString("\n") + TPZString(m_Network->getMessagesEscape()) +
+   //TPZString("\n") + TPZString(m_Network->getMessagesToTx()) +
+   TPZString("\n") + TPZString(m_Network->getFlitsTx()) +
+   //TPZString("\n") + TPZString(m_Network->getMessagesEscape()) +
    TPZString("\n") + TPZString(latMediaMsgTotal) +
    TPZString("\n") + TPZString(latMediaMsgNetwork) +
    TPZString("\n") + TPZString(latMediaMsgBuffer) +

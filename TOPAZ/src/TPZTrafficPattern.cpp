@@ -1196,6 +1196,12 @@ Boolean TPZTrafficPatternFile::readNextMessage()
    //is:
    //GenTime Xsrc Ysrc Zsrc Xdst Ydst Zdst Size
    
+   //Changed by Anderson
+   // For trace simulation, size is in number of bytes.
+   // Each line in trace file is one msg/pkt. 1 msg = 1 pkt.
+   // The number of flits injected depend on the flits size.
+   // Here, flits size is actually passed through LinkWidth tag in Simula.sgm
+   
    TPZString line;
    do {
       line = TPZString::lineFrom(*m_File);
@@ -1212,12 +1218,15 @@ Boolean TPZTrafficPatternFile::readNextMessage()
    unsigned y_dst = line.word(6).asInteger();
    unsigned z_dst = line.word(7).asInteger();
 
-   unsigned size = line.word(8).asInteger();
+   unsigned size = (unsigned) ceil((double) line.word(8).asInteger() / (getSimulation().getFlitSize()));
+   
    m_Message.setGenerationTime(time);
    m_Message.setSource(TPZPosition(x_org, y_org, z_org));
    m_Message.setDestiny(TPZPosition(x_dst, y_dst, z_dst));
-   m_Message.setPacketSize(getSimulation().getPacketLength());
-   m_Message.setMessageSize(size);
+   m_Message.setPacketSize(size);
+   //m_Message.setPacketSize(getSimulation().getPacketLength());
+   m_Message.setMessageSize(1);
+   //m_Message.setMessageSize(size);
 
    return true;
 }

@@ -7,15 +7,19 @@
 #/**************************************************/
 
 #/* All verilog files, separated by spaces         */
-set my_verilog_files [list arbiterPN.v demux1to2.v demux1to5.v demuxWrapper1to2.v demuxWrapper1to5.v global.v highestBit.v mux2to1.v mux5to1.v muxWrapper2to1.v muxWrapper5to1.v outSelTrans.v permutationNetwork.v permuterBlock.v routeComp.v topBLESS.v Xbar5Ports.v xbarCtrl.v topMultiNoC.v secondHighestBit.v lastBit.v computePPV.v portAllocParallel.v firstbit.v highestBit5.v highestBit6.v ejector.v ejectKillNInject.v local.v]
+set my_verilog_files [list arbiterPN.v demux1to2.v demux1to5.v demuxWrapper1to2.v demuxWrapper1to5.v global.v highestBit.v mux2to1.v mux5to1.v muxWrapper2to1.v muxWrapper5to1.v outSelTrans.v permutationNetwork.v permuterBlock.v routeComp.v topBLESS.v Xbar5Ports.v xbarCtrl.v topMultiNoC.v secondHighestBit.v lastBit.v computePPV.v portAllocParallel.v firstbit.v highestBit5.v highestBit6.v ejector.v ejectKillNInject.v local.v dff.v]
 
 #/* Top-level Module                               */
 #set my_toplevel demux1to6
+#set my_toplevel topMultiNoC
 #set my_toplevel topBLESS
 #set my_toplevel portAllocParallel 
-#set my_toplevel xbar6Ports 
-#set my_toplevel  portAllocWrapper
-set my_toplevel  local
+#set my_toplevel Xbar5Ports 
+#set my_toplevel permutationNetwork
+#set my_toplevel routeComp
+#set my_toplevel local 
+set my_toplevel dff 
+
 
 #/* The name of the clock pin. If no clock-pin     */
 #/* exists, pick anything                          */
@@ -24,13 +28,16 @@ set my_clock_pin clk
 #/* Target frequency in MHz for optimization       */
 set my_clk_freq_MHz 500
 
-set my_period 0.2
+set my_period 1.15 
 
 #/* Delay of input signals (Clock-to-Q, Package etc.)  */
-set my_input_delay_ns [expr $my_period*0.1]
+#set my_input_delay_ns [expr $my_period*0.1]
+set my_input_delay_ns 0
+
 
 #/* Reserved time for output signals (Holdtime etc.)   */
-set my_output_delay_ns [expr $my_period*0.1]
+#set my_output_delay_ns [expr $my_period*0.1]
+set my_output_delay_ns 0
 
 
 #/**************************************************/
@@ -58,6 +65,9 @@ uniquify
 
 #set my_period [expr 1000 / $my_clk_freq_MHz]
 
+#create_operating_conditions -name NEW -library gscl45nm -process 1 -temperature 27 -voltage 0.5
+#set_operating_conditions NEW
+
 set find_clock [ find port [list $my_clock_pin] ]
 if {  $find_clock != [list] } {
    set clk_name $my_clock_pin
@@ -67,9 +77,15 @@ if {  $find_clock != [list] } {
    create_clock -period $my_period -name $clk_name
 }
 
+#set_switching_activity -toggle_rate 0.1 -select input 
+
+set_switching_activity -toggle_rate 0.1 -select {regs_on_clock {clk}} 
 set_driving_cell  -lib_cell INVX1  [all_inputs]
 set_input_delay $my_input_delay_ns -clock $clk_name [remove_from_collection [all_inputs] $my_clock_pin]
 set_output_delay $my_output_delay_ns -clock $clk_name [all_outputs]
+
+
+compile_ultra -gate_clock
 
 compile -ungroup_all -map_effort medium
 
@@ -89,7 +105,7 @@ write -f db -hier -output /tmp/xxx1698/$filename -xg_force_db
 
 redirect timing.rep { report_timing }
 redirect cell.rep { report_cell }
-redirect power.rep { report_power }
+redirect power.rep { report_power}
 
 quit
 
