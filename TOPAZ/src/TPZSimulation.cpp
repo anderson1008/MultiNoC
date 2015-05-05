@@ -463,9 +463,9 @@ void TPZSimulation :: run(uTIME time)
       {
       
          ///Stop when all injected msg are received
-          if(getNetwork()->getMessagesTx()-getNetwork()->getMessagesRx()==0 )
+          //if(getNetwork()->getMessagesTx()-getNetwork()->getMessagesRx()==0 )
 			           
-         // if( getNetwork()->getMessagesRx() == 40000000)
+          if( getNetwork()->getMessagesRx() == 10000000)
 			 {    
              if(m_Clock>=100)
                m_SimulationCycles=m_Clock;  
@@ -692,9 +692,9 @@ TPZString TPZSimulation :: writeSimulationStatus()
    double RCToggleRate =  m_Network->getEventCount( TPZNetwork::RouteComputation) / (RCNum * m_Clock);
    double PNToggleRate =  m_Network->getEventCount( TPZNetwork::LinkTraversal) / (PNNum * m_Clock);
    double PAToggleRate =  m_Network->getEventCount( TPZNetwork::SWTraversal) / (PANum * m_Clock);
-   double LocalToggleRate = (m_Network->getMessagesTx() + m_Network->getMessagesRx()) * m_PacketLength / (LocalNum * m_Clock);
+   double LocalToggleRate = (m_Network->getFlitsTx() + m_Network->getFlitsRx()) / (LocalNum * m_Clock);
    double XbarToggleRate = m_Network->getEventCount( TPZNetwork::SWTraversal) / (XbarNum * m_Clock);
-   double LatchToggleRate = (m_Network->getEventCount( TPZNetwork::LinkTraversal) * 3 + (m_Network->getMessagesTx() + m_Network->getMessagesRx()) * m_PacketLength * 2 + m_Network->getEventCount( TPZNetwork::RouterDeflect)) / (LatchNum * m_Clock); // Each network flit toggle all 3 latches at each router. Local inject and eject flits toggle 2 latches. Bypass flit toggle only latch once.
+   double LatchToggleRate = (m_Network->getEventCount( TPZNetwork::LinkTraversal) * 3 + (m_Network->getFlitsTx() + m_Network->getFlitsRx()) * 2 + m_Network->getEventCount( TPZNetwork::RouterDeflect)) / (LatchNum * m_Clock); // Each network flit toggle all 3 latches at each router. Local inject and eject flits toggle 2 latches. Bypass flit toggle only latch once.
    double LinkToggleRate = m_Network->getEventCount( TPZNetwork::LinkTraversal) / (LinkNum * m_Clock);
    
    double RCDynamic = RCDynamicUnitPower / toggleRateDefault * RCToggleRate * simulTime;
@@ -778,28 +778,32 @@ TPZString TPZSimulation :: writeSimulationStatus()
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouteComputation))+
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::LinkTraversal))+
    TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::SWTraversal)) +
-   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterDeflect)/m_Network->getEventCount( TPZNetwork::SWTraversal)) + TPZString("\n") +
+   TPZString("\n") + TPZString(m_Network->getEventCount( TPZNetwork::RouterDeflect)/m_Network->getEventCount( TPZNetwork::SWTraversal)) + 
+   TPZString("\n") +
    TPZString("\n") + TPZString(RCStatic) +
    TPZString("\n") + TPZString(PNStatic) +
    TPZString("\n") + TPZString(PAStatic) +
-   TPZString("\n") + TPZString(LocalStatic) +
    TPZString("\n") + TPZString(XbarStatic) +
+   TPZString("\n") + TPZString(LocalStatic) +
+   TPZString("\n") + TPZString(LinkStatic) +
    TPZString("\n") + TPZString(LatchStatic) +
-   TPZString("\n") + TPZString(LinkStatic) + TPZString("\n") +
+   TPZString("\n") +
    TPZString("\n") + TPZString(RCDynamic) +
    TPZString("\n") + TPZString(PNDynamic) +
    TPZString("\n") + TPZString(PADynamic) +
-   TPZString("\n") + TPZString(LocalDynamic) +
    TPZString("\n") + TPZString(XbarDynamic) +
+   TPZString("\n") + TPZString(LocalDynamic) +
+   TPZString("\n") + TPZString(LinkDynamic) + 
    TPZString("\n") + TPZString(LatchDynamic) +
-   TPZString("\n") + TPZString(LinkDynamic) + TPZString("\n") +
+   TPZString("\n") +
    TPZString("\n") + TPZString(RCOverall) +
    TPZString("\n") + TPZString(PNOverall) +
    TPZString("\n") + TPZString(PAOverall) +
-   TPZString("\n") + TPZString(LocalOverall) +
    TPZString("\n") + TPZString(XbarOverall) +
+   TPZString("\n") + TPZString(LocalOverall) +
+   TPZString("\n") + TPZString(LinkOverall) + 
    TPZString("\n") + TPZString(LatchOverall) +
-   TPZString("\n") + TPZString(LinkOverall) + TPZString("\n") +
+   TPZString("\n") +
    TPZString("\n") + TPZString(overallLeakage) +
    TPZString("\n") + TPZString(overallDynamic) +
    TPZString("\n") + TPZString(overallPower);  

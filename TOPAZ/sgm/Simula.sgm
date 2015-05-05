@@ -8,7 +8,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="blackscholes.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/blackscholes.trace" numMessTypes=4>
    <Seed               id=113>
    <Load               id=0.1>
    <MessageLength      id=1>
@@ -20,7 +20,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="bodytrack.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/bodytrack.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -31,7 +31,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="canneal.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/canneal.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -43,7 +43,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="dedup.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/dedup.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -55,7 +55,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="facesim.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/facesim.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -68,7 +68,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="ferret.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/ferret.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -80,7 +80,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="fluidanimate.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/fluidanimate.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -92,7 +92,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="freqmine.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/freqmine.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -104,7 +104,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="rtview.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/rtview.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -117,7 +117,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="streamcluster.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/streamcluster.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -130,7 +130,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="swaptions.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/swaptions.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -143,7 +143,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="vips.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/vips.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
@@ -156,7 +156,7 @@
    <Network            id="T44_BLESS_MULT_NOC2">
    <SimulationCycles   id=100000000000000000>
    <StopInjectionAfterMsg id=0>
-   <TrafficPattern     id="MODAL" type=TRACE traceFile="x264.trace" numMessTypes=4>
+   <TrafficPattern     id="MODAL" type=TRACE traceFile="/localhome/xxx1698/tracePARSEC/x264.trace" numMessTypes=4>
    <Seed               id=113>
    <MessageLength      id=1>
    <Load               id=0.1>
