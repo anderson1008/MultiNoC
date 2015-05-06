@@ -694,7 +694,7 @@ TPZString TPZSimulation :: writeSimulationStatus()
    double PAToggleRate =  m_Network->getEventCount( TPZNetwork::SWTraversal) / (PANum * m_Clock);
    double LocalToggleRate = (m_Network->getFlitsTx() + m_Network->getFlitsRx()) / (LocalNum * m_Clock);
    double XbarToggleRate = m_Network->getEventCount( TPZNetwork::SWTraversal) / (XbarNum * m_Clock);
-   double LatchToggleRate = (m_Network->getEventCount( TPZNetwork::LinkTraversal) * 3 + (m_Network->getFlitsTx() + m_Network->getFlitsRx()) * 2 + m_Network->getEventCount( TPZNetwork::RouterDeflect)) / (LatchNum * m_Clock); // Each network flit toggle all 3 latches at each router. Local inject and eject flits toggle 2 latches. Bypass flit toggle only latch once.
+   double LatchToggleRate = (m_Network->getEventCount( TPZNetwork::LinkTraversal) * 3 + (m_Network->getFlitsTx() + m_Network->getFlitsRx()) * 2 + m_Network->getEventCount( TPZNetwork::RouterBypass)) / (LatchNum * m_Clock); // Each network flit toggle all 3 latches at each router. Local inject and eject flits toggle 2 latches. Bypass flit toggle only latch once.
    double LinkToggleRate = m_Network->getEventCount( TPZNetwork::LinkTraversal) / (LinkNum * m_Clock);
    
    double RCDynamic = RCDynamicUnitPower / toggleRateDefault * RCToggleRate * simulTime;
